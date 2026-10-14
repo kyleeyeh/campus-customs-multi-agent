@@ -1,0 +1,285 @@
+{
+  "generated_at": "2026-10-07T03:57:29+00:00",
+  "server": "mcp_server/server.py",
+  "transport": "stdio",
+  "database": "data/campus_customs_new.db",
+  "tools_advertised": [
+    "check_stock",
+    "find_restock_vendor",
+    "get_cash_position"
+  ],
+  "how_verified": "Each tool was called over a real MCP stdio connection. Every value below was then re-read from data/campus_customs_new.db with plain SQL and compared field by field.",
+  "all_checks_passed": true,
+  "calls": [
+    {
+      "ticket": 101,
+      "prompt": "Ticket 101: Tauhid Zaman wants one Bulldog tee, SKU CC-TEE-WHITE, in size S. Do we have it on the shelf right now, and if not, how many are we short?",
+      "tool": "check_stock",
+      "arguments": {
+        "sku": "CC-TEE-WHITE",
+        "size": "S",
+        "qty_wanted": 1
+      },
+      "tool_output": {
+        "sku": "CC-TEE-WHITE",
+        "name": "Classic Bulldog Tee",
+        "size": "S",
+        "qty_on_hand": 0,
+        "qty_wanted": 1,
+        "shortfall": 1,
+        "can_fill_now": false,
+        "location": "Aisle B",
+        "unit_cost": 8.0,
+        "list_price": 28.0,
+        "line_total_at_list": 28.0
+      },
+      "verification": [
+        {
+          "check": "qty_on_hand matches inventory table",
+          "tool_returned": 0,
+          "database_says": 0,
+          "match": true
+        },
+        {
+          "check": "unit_cost matches pricing table",
+          "tool_returned": 8.0,
+          "database_says": 8.0,
+          "match": true
+        },
+        {
+          "check": "list_price matches pricing table",
+          "tool_returned": 28.0,
+          "database_says": 28.0,
+          "match": true
+        },
+        {
+          "check": "shortfall = wanted - on hand",
+          "tool_returned": 1,
+          "database_says": 1,
+          "match": true
+        },
+        {
+          "check": "can_fill_now is false",
+          "tool_returned": false,
+          "database_says": false,
+          "match": true
+        }
+      ],
+      "all_checks_passed": true
+    },
+    {
+      "ticket": 101,
+      "prompt": "Ticket 101 cannot be filled from stock. Who can reprint CC-TEE-WHITE, how long will it take, and will they actually ship to us right now?",
+      "tool": "find_restock_vendor",
+      "arguments": {
+        "sku": "CC-TEE-WHITE",
+        "qty": 1
+      },
+      "tool_output": {
+        "sku": "CC-TEE-WHITE",
+        "product_name": "Classic Bulldog Tee",
+        "inferred_category": "apparel",
+        "qty": 1,
+        "unit_cost": 8.0,
+        "restock_cost": 8.0,
+        "shop_date": "2026-08-31",
+        "vendors": [
+          {
+            "vendor_id": 1,
+            "vendor_name": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5,
+            "will_ship": false,
+            "blocked_by_open_invoices": [
+              {
+                "id": 501,
+                "amount": 840.0,
+                "due_date": "2026-08-28",
+                "status": "open",
+                "description": "Rush reprint CC-TEE-WHITE S",
+                "is_overdue": true
+              }
+            ],
+            "amount_to_unblock": 840.0,
+            "earliest_arrival_if_ordered_today": "2026-09-05"
+          }
+        ],
+        "any_vendor_can_ship": false,
+        "note": "No vendor whose specialty covers this product can ship right now."
+      },
+      "verification": [
+        {
+          "check": "vendor_id matches the apparel vendor in vendors",
+          "tool_returned": 1,
+          "database_says": 1,
+          "match": true
+        },
+        {
+          "check": "lead_days matches vendors table",
+          "tool_returned": 5,
+          "database_says": 5,
+          "match": true
+        },
+        {
+          "check": "blocking invoice id matches invoices table",
+          "tool_returned": 501,
+          "database_says": 501,
+          "match": true
+        },
+        {
+          "check": "amount_to_unblock matches invoice amount",
+          "tool_returned": 840.0,
+          "database_says": 840.0,
+          "match": true
+        },
+        {
+          "check": "arrival = desk.date_today + lead_days",
+          "tool_returned": "2026-09-05",
+          "database_says": "2026-09-05",
+          "match": true
+        },
+        {
+          "check": "vendor will not ship",
+          "tool_returned": false,
+          "database_says": false,
+          "match": true
+        }
+      ],
+      "all_checks_passed": true
+    },
+    {
+      "ticket": 102,
+      "prompt": "Ticket 102: Elm City Properties says rent is due. What is our cash balance, what do we owe in total, what is already overdue as of the shop's date, and what is left if we settle everything?",
+      "tool": "get_cash_position",
+      "arguments": {},
+      "tool_output": {
+        "shop_date": "2026-08-31",
+        "account": "checking",
+        "balance": 3400.0,
+        "obligations": [
+          {
+            "kind": "vendor_invoice",
+            "ref_id": 501,
+            "description": "Rush reprint CC-TEE-WHITE S",
+            "owed_to": "Bulldog Print Co",
+            "amount": 840.0,
+            "due_date": "2026-08-28",
+            "days_until_due": -3,
+            "is_overdue": true
+          },
+          {
+            "kind": "rent",
+            "ref_id": 1,
+            "description": "Rent for Chapel Street shop",
+            "owed_to": "Elm City Properties",
+            "amount": 2400.0,
+            "due_date": "2026-09-02",
+            "days_until_due": 2,
+            "is_overdue": false
+          }
+        ],
+        "total_owed": 3240.0,
+        "remaining_if_all_paid": 160.0,
+        "can_cover_all_obligations": true,
+        "overdue_count": 1,
+        "payments_made": [],
+        "note": "No revenue is modeled; this balance only decreases."
+      },
+      "verification": [
+        {
+          "check": "balance matches cash_accounts",
+          "tool_returned": 3400.0,
+          "database_says": 3400.0,
+          "match": true
+        },
+        {
+          "check": "shop_date matches desk.date_today",
+          "tool_returned": "2026-08-31",
+          "database_says": "2026-08-31",
+          "match": true
+        },
+        {
+          "check": "rent amount matches leases.monthly_rent",
+          "tool_returned": 2400.0,
+          "database_says": 2400.0,
+          "match": true
+        },
+        {
+          "check": "rent due date matches leases.next_due",
+          "tool_returned": "2026-09-02",
+          "database_says": "2026-09-02",
+          "match": true
+        },
+        {
+          "check": "total_owed = open invoices + rent",
+          "tool_returned": 3240.0,
+          "database_says": 3240.0,
+          "match": true
+        },
+        {
+          "check": "remaining = balance - total_owed",
+          "tool_returned": 160.0,
+          "database_says": 160.0,
+          "match": true
+        },
+        {
+          "check": "one obligation is overdue",
+          "tool_returned": 1,
+          "database_says": 1,
+          "match": true
+        }
+      ],
+      "all_checks_passed": true
+    },
+    {
+      "ticket": 103,
+      "prompt": "Ticket 103: the Yale AI Club wants 20 navy hoodies in size M. How many do we actually have, and what is the margin at list price?",
+      "tool": "check_stock",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY",
+        "size": "M",
+        "qty_wanted": 20
+      },
+      "tool_output": {
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "size": "M",
+        "qty_on_hand": 8,
+        "qty_wanted": 20,
+        "shortfall": 12,
+        "can_fill_now": false,
+        "location": "Aisle A",
+        "unit_cost": 22.0,
+        "list_price": 58.0,
+        "line_total_at_list": 1160.0
+      },
+      "verification": [
+        {
+          "check": "qty_on_hand matches inventory table",
+          "tool_returned": 8,
+          "database_says": 8,
+          "match": true
+        },
+        {
+          "check": "shortfall = 20 - 8",
+          "tool_returned": 12,
+          "database_says": 12,
+          "match": true
+        },
+        {
+          "check": "unit_cost matches pricing table",
+          "tool_returned": 22.0,
+          "database_says": 22.0,
+          "match": true
+        },
+        {
+          "check": "line_total_at_list = list_price * 20",
+          "tool_returned": 1160.0,
+          "database_says": 1160.0,
+          "match": true
+        }
+      ],
+      "all_checks_passed": true
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "starting_balance": 3400.0,
+  "ending_balance": 160.0,
+  "ledger": [
+    {
+      "approval_id": 2,
+      "ticket_id": 102,
+      "kind": "payment",
+      "summary": "Approve $2,400 rent payment to Elm City Properties, due 2026-09-02",
+      "requested_by": "facilities",
+      "amount": 2400.0,
+      "executed": true,
+      "payment_id": 1,
+      "paid_at": "2026-08-31",
+      "approved_by": "Kyle Yeh",
+      "balance_before": 3400.0,
+      "balance_after": 1000.0,
+      "ticket_closed": null
+    },
+    {
+      "approval_id": 1,
+      "ticket_id": 101,
+      "kind": "payment",
+      "summary": "Approve payment of overdue Bulldog Print Co invoice 501 for $840.",
+      "requested_by": "accounting",
+      "amount": 840.0,
+      "executed": true,
+      "payment_id": 2,
+      "paid_at": "2026-08-31",
+      "approved_by": "Kyle Yeh",
+      "balance_before": 1000.0,
+      "balance_after": 160.0,
+      "ticket_closed": null
+    },
+    {
+      "approval_id": 3,
+      "ticket_id": 103,
+      "kind": "discount",
+      "summary": "Approve 20 CC-HOOD-NAVY M hoodies at $36.67 per unit.",
+      "requested_by": "accounting",
+      "amount": 733.4,
+      "executed": false,
+      "payment_id": null,
+      "paid_at": null,
+      "approved_by": null,
+      "balance_before": 160.0,
+      "balance_after": 160.0,
+      "ticket_closed": null
+    },
+    {
+      "approval_id": 4,
+      "ticket_id": 103,
+      "kind": "payment",
+      "summary": "Approve payment of overdue Bulldog Print Co invoice 501 for $840.00.",
+      "requested_by": "accounting",
+      "amount": 840.0,
+      "executed": false,
+      "payment_id": null,
+      "paid_at": null,
+      "approved_by": null,
+      "balance_before": 160.0,
+      "balance_after": 160.0,
+      "ticket_closed": null
+    }
+  ],
+  "runs": [
+    {
+      "ticket_id": 101,
+      "run_id": "run-101-35c3f037",
+      "result": null
+    },
+    {
+      "ticket_id": 102,
+      "run_id": "run-102-3ef5768e",
+      "result": null
+    },
+    {
+      "ticket_id": 103,
+      "run_id": "run-103-5d789ce4",
+      "result": null
+    },
+    {
+      "ticket_id": 103,
+      "run_id": "run-103-7ce066b4",
+      "result": null
+    }
+  ],
+  "final_board": null,
+  "final_cash": null
+}

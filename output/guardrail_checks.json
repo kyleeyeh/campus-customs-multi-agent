@@ -1,0 +1,97 @@
+[
+  {
+    "result": "PASS",
+    "check": "No tool on the server can send anything",
+    "detail": "17 tools, none matching send/email/sms. Drafting is save_draft_message."
+  },
+  {
+    "result": "PASS",
+    "check": "pay_invoice refuses a non-existent approval",
+    "detail": "No approval with id 999. Call request_approval first."
+  },
+  {
+    "result": "PASS",
+    "check": "request_approval parks as 'pending'",
+    "detail": "approval #1"
+  },
+  {
+    "result": "PASS",
+    "check": "pay_rent refuses while the approval is pending",
+    "detail": "Approval 1 is 'pending', not 'approved'."
+  },
+  {
+    "result": "PASS",
+    "check": "No money moved on a refused payment",
+    "detail": "balance $3,400.00"
+  },
+  {
+    "result": "PASS",
+    "check": "Rent approval cannot be replayed to pay invoice 501",
+    "detail": "Approval 1 authorises payment ref_id=1, not ref_id=501."
+  },
+  {
+    "result": "PASS",
+    "check": "Approved rent payment succeeds",
+    "detail": "payment #1"
+  },
+  {
+    "result": "PASS",
+    "check": "Cash debited correctly",
+    "detail": "$3,400.00 - $2,400.00 = $1,000.00"
+  },
+  {
+    "result": "PASS",
+    "check": "Payment records the human approver, not an agent",
+    "detail": "approved_by = 'Kyle Yeh'"
+  },
+  {
+    "result": "PASS",
+    "check": "Lease next_due advanced a month",
+    "detail": "2026-09-02 -> 2026-10-02"
+  },
+  {
+    "result": "PASS",
+    "check": "Same rent cycle cannot be paid twice",
+    "detail": "Rent for lease 1 already recorded (payment 1)."
+  },
+  {
+    "result": "PASS",
+    "check": "Contractual debt may be paid below the $250 reserve",
+    "detail": "balance now $160.00 (reserve $250 binds discretionary spend only)"
+  },
+  {
+    "result": "PASS",
+    "check": "Same invoice cannot be paid twice",
+    "detail": "Invoice 501 is already 'paid'. Not paying twice."
+  },
+  {
+    "result": "PASS",
+    "check": "Unaffordable purchase order is refused at the point it is raised",
+    "detail": "12 x $22 = $264 against $160.00 available. REFUSED: this payment would overdraw the account."
+  },
+  {
+    "result": "PASS",
+    "check": "A payment larger than the balance is refused even when approved",
+    "detail": "$5,000.00 against $160.00. REFUSED: this payment would overdraw the account."
+  },
+  {
+    "result": "PASS",
+    "check": "Balance unchanged after the refusal",
+    "detail": "$160.00"
+  },
+  {
+    "result": "PASS",
+    "check": "Ticket cannot be marked resolved with an approval pending",
+    "detail": "Ticket 103 has pending approval(s) [4]. Use status='waiting_approval'."
+  },
+  {
+    "result": "PASS",
+    "check": "Ticket may be marked waiting_approval",
+    "detail": ""
+  },
+  {
+    "result": "PASS",
+    "check": "Draft is saved as 'draft' and reports sent=False",
+    "detail": "draft #1"
+  }
+]

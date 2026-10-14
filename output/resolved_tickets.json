@@ -1,0 +1,336 @@
+{
+  "shop_date": "2026-08-31",
+  "model": "gpt-6-luna",
+  "starting_checking_balance": 3400.0,
+  "ending_checking_balance": 160.0,
+  "total_paid": 3240.0,
+  "arithmetic_check": {
+    "starting_minus_payments": 160.0,
+    "database_cash_accounts_balance": 160.0,
+    "matches": true
+  },
+  "tickets": [
+    {
+      "id": 101,
+      "subject": "Bulldog tee",
+      "requester": "Tauhid Zaman",
+      "type": "customer_order",
+      "final_status": "resolved",
+      "resolved_at": "2026-08-31",
+      "assignee": "accounting",
+      "assignee_character": "Patrick Brewer",
+      "outcome": "The requested CC-TEE-WHITE size S cannot be supplied now: stock is 0, leaving a shortfall of 1. Payment approval 1 is pending for the overdue $840 invoice 501; Bulldog Print Co will not ship until it is paid, and after unblocking a one-unit restock would cost $8 and arrive in about 5 days (earliest 2026-09-05). SETTLED: Kyle Yeh approved payment of $840.00 for invoice 501 on 2026-08-31; checking balance is now $160.00.",
+      "runs": [
+        "run-101-35c3f037"
+      ],
+      "delegation_chain": [
+        "boss -> inventory",
+        "boss -> accounting"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "boss",
+          "character": "Johnny Rose",
+          "tools_used": [
+            "list_open_tickets",
+            "get_ticket",
+            "update_ticket"
+          ],
+          "delegated_to": [
+            "inventory",
+            "accounting"
+          ],
+          "said": null
+        },
+        {
+          "agent": "inventory",
+          "character": "David Rose",
+          "tools_used": [
+            "check_stock",
+            "find_restock_vendor"
+          ],
+          "delegated_to": [],
+          "said": null
+        },
+        {
+          "agent": "accounting",
+          "character": "Patrick Brewer",
+          "tools_used": [
+            "get_cash_position",
+            "list_approvals",
+            "get_shop_policy",
+            "request_approval"
+          ],
+          "delegated_to": [],
+          "said": null
+        }
+      ],
+      "human_approvals": [
+        {
+          "approval_id": 1,
+          "kind": "payment",
+          "summary": "Approve payment of overdue Bulldog Print Co invoice 501 for $840.",
+          "amount": 840.0,
+          "requested_by": "accounting",
+          "requested_by_character": "Patrick Brewer",
+          "status": "approved",
+          "decided_by": "Kyle Yeh",
+          "decided_at": "2026-10-14 18:56:39",
+          "decision_note": null,
+          "payload": {
+            "tool": "pay_invoice",
+            "invoice_id": 501
+          }
+        }
+      ],
+      "payments_executed": [
+        {
+          "payment_id": 2,
+          "kind": "invoice",
+          "ref_id": 501,
+          "amount": 840.0,
+          "paid_at": "2026-08-31",
+          "approved_by": "Kyle Yeh"
+        }
+      ],
+      "drafts_written": [],
+      "purchase_orders": [],
+      "cash": {
+        "balance_before": 1000.0,
+        "change": -840.0,
+        "balance_after": 160.0
+      }
+    },
+    {
+      "id": 102,
+      "subject": "Rent due",
+      "requester": "Elm City Properties",
+      "type": "rent_notice",
+      "final_status": "resolved",
+      "resolved_at": "2026-08-31",
+      "assignee": "facilities",
+      "assignee_character": "Stevie Budd",
+      "outcome": "The $2,400 rent for the Chapel Street lease is unpaid and due 2026-09-02. Facilities raised approval request 2 for payment; rent may be paid from the $3,400 checking balance, leaving $1,000, but no payment has been made pending human approval. SETTLED: Kyle Yeh approved payment of $2,400.00 for rent on lease 1 on 2026-08-31; checking balance is now $1,000.00.",
+      "runs": [
+        "run-102-3ef5768e"
+      ],
+      "delegation_chain": [
+        "boss -> facilities"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "boss",
+          "character": "Johnny Rose",
+          "tools_used": [
+            "get_ticket",
+            "update_ticket"
+          ],
+          "delegated_to": [
+            "facilities"
+          ],
+          "said": null
+        },
+        {
+          "agent": "facilities",
+          "character": "Stevie Budd",
+          "tools_used": [
+            "get_lease",
+            "get_cash_position",
+            "get_ticket",
+            "request_approval"
+          ],
+          "delegated_to": [],
+          "said": null
+        }
+      ],
+      "human_approvals": [
+        {
+          "approval_id": 2,
+          "kind": "payment",
+          "summary": "Approve $2,400 rent payment to Elm City Properties, due 2026-09-02",
+          "amount": 2400.0,
+          "requested_by": "facilities",
+          "requested_by_character": "Stevie Budd",
+          "status": "approved",
+          "decided_by": "Kyle Yeh",
+          "decided_at": "2026-10-14 18:54:55",
+          "decision_note": null,
+          "payload": {
+            "tool": "pay_rent",
+            "ref_id": 1
+          }
+        }
+      ],
+      "payments_executed": [
+        {
+          "payment_id": 1,
+          "kind": "rent",
+          "ref_id": 1,
+          "amount": 2400.0,
+          "paid_at": "2026-08-31",
+          "approved_by": "Kyle Yeh"
+        }
+      ],
+      "drafts_written": [],
+      "purchase_orders": [],
+      "cash": {
+        "balance_before": 3400.0,
+        "change": -2400.0,
+        "balance_after": 1000.0
+      }
+    },
+    {
+      "id": 103,
+      "subject": "Bulk hoodie discount",
+      "requester": "Yale AI Club",
+      "type": "price_override",
+      "final_status": "resolved",
+      "resolved_at": "2026-08-31",
+      "assignee": "accounting",
+      "assignee_character": "Patrick Brewer",
+      "outcome": "The approved $36.67 unit price meets the 40% gross-margin floor, but the shop cannot fulfill all 20: 8 are in stock and the remaining 12 would cost $264 to restock. With $160 cash, the purchase order would overdraw the account by $104 and cannot be placed; invoice 501 has been paid, and the 12-unit restock could arrive 2026-09-05 only if funding is addressed and a purchase order is approved. Draft customer reply 1 is ready; nothing has been sent.",
+      "runs": [
+        "run-103-5d789ce4",
+        "run-103-7ce066b4"
+      ],
+      "delegation_chain": [
+        "boss -> accounting",
+        "boss -> inventory",
+        "boss -> accounting",
+        "boss -> inventory",
+        "boss -> accounting",
+        "boss -> customer_service",
+        "boss -> accounting"
+      ],
+      "agent_contributions": [
+        {
+          "agent": "boss",
+          "character": "Johnny Rose",
+          "tools_used": [
+            "get_ticket",
+            "update_ticket",
+            "get_shop_policy"
+          ],
+          "delegated_to": [
+            "accounting",
+            "inventory",
+            "customer_service"
+          ],
+          "said": null
+        },
+        {
+          "agent": "accounting",
+          "character": "Patrick Brewer",
+          "tools_used": [
+            "get_ticket",
+            "get_shop_policy",
+            "get_cash_position",
+            "evaluate_discount",
+            "request_approval",
+            "list_approvals",
+            "create_purchase_order"
+          ],
+          "delegated_to": [],
+          "said": null
+        },
+        {
+          "agent": "inventory",
+          "character": "David Rose",
+          "tools_used": [
+            "find_restock_vendor",
+            "get_ticket",
+            "check_stock"
+          ],
+          "delegated_to": [],
+          "said": null
+        },
+        {
+          "agent": "customer_service",
+          "character": "Alexis Rose",
+          "tools_used": [
+            "get_ticket",
+            "save_draft_message"
+          ],
+          "delegated_to": [],
+          "said": null
+        }
+      ],
+      "human_approvals": [
+        {
+          "approval_id": 3,
+          "kind": "discount",
+          "summary": "Approve 20 CC-HOOD-NAVY M hoodies at $36.67 per unit.",
+          "amount": 733.4,
+          "requested_by": "accounting",
+          "requested_by_character": "Patrick Brewer",
+          "status": "approved",
+          "decided_by": "Kyle Yeh",
+          "decided_at": "2026-10-14 18:57:28",
+          "decision_note": null,
+          "payload": {
+            "tool": "discount",
+            "sku": "CC-HOOD-NAVY",
+            "size": "M",
+            "qty": 20,
+            "unit_price": 36.67
+          }
+        },
+        {
+          "approval_id": 4,
+          "kind": "payment",
+          "summary": "Approve payment of overdue Bulldog Print Co invoice 501 for $840.00.",
+          "amount": 840.0,
+          "requested_by": "accounting",
+          "requested_by_character": "Patrick Brewer",
+          "status": "approved",
+          "decided_by": "Kyle Yeh",
+          "decided_at": "2026-10-14 18:57:31",
+          "decision_note": null,
+          "payload": {
+            "tool": "pay_invoice",
+            "invoice_id": 501
+          }
+        }
+      ],
+      "payments_executed": [],
+      "drafts_written": [
+        {
+          "draft_id": 1,
+          "audience": "customer",
+          "recipient": "Yale AI Club",
+          "subject": "Update on your 20 navy hoodies",
+          "status": "draft",
+          "sent": false,
+          "created_by": "customer_service"
+        }
+      ],
+      "purchase_orders": [],
+      "cash": {
+        "balance_before": 160.0,
+        "change": 0,
+        "balance_after": 160.0
+      }
+    }
+  ],
+  "all_payments": [
+    {
+      "id": 1,
+      "kind": "rent",
+      "ref_id": 1,
+      "amount": 2400.0,
+      "account": "checking",
+      "paid_at": "2026-08-31",
+      "approved_by": "Kyle Yeh"
+    },
+    {
+      "id": 2,
+      "kind": "invoice",
+      "ref_id": 501,
+      "amount": 840.0,
+      "account": "checking",
+      "paid_at": "2026-08-31",
+      "approved_by": "Kyle Yeh"
+    }
+  ],
+  "run_cost_usd": 0
+}

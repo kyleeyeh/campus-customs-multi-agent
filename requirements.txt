@@ -1,0 +1,16 @@
+# Agent framework. The slim package plus only the extras this project uses:
+# `openai` for the Portkey-compatible chat endpoint, `mcp` for the toolset that
+# talks to mcp_server/server.py.
+pydantic-ai-slim[openai,mcp]>=2.54.0
+openai>=3.26.1
+
+# MCP server + client.
+fastmcp>=4.0.11
+mcp>=2.3.0
+
+# Backend API and dashboard host (Problem 6+).
+fastapi>=0.115
+uvicorn[standard]>=0.32
+
+python-dotenv>=1.0
+pydantic>=2.9

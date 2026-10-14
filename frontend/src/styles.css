@@ -1,0 +1,505 @@
+/* =========================================================================
+   The Rosebud Operations Desk
+   -------------------------------------------------------------------------
+   The conceit: this is the front desk of a small-town motel that happens to
+   run an apparel shop. Warm paper, a green neon sign, a brass ledger, and a
+   cast of people who each dress very differently.
+
+   Three colour families do all the work:
+     - paper/ink  : the desk itself, warm cream and soft brown-black
+     - neon       : the motel sign green, used ONLY for live/active things
+     - per-cast   : each character's own colour, from how they actually dress
+
+   Rule followed throughout: colour means something. Green is "happening now",
+   plum is "a human must decide", a character's colour is that character.
+   Nothing is tinted just to look nice.
+   ========================================================================= */
+
+:root {
+  --paper: #f4efe6;
+  --paper-2: #fbf8f2;
+  --card: #fffdf9;
+  --ink: #2a2622;
+  --ink-soft: #6d6459;
+  --ink-faint: #9b9184;
+  --rule: #e0d7c8;
+  --rule-strong: #cdc1ae;
+
+  --neon: #1f6f4f;
+  --neon-bright: #2a9b6c;
+  --neon-glow: rgba(42, 155, 108, 0.22);
+
+  --brass: #a9833f;
+  --brass-soft: #f3e9d4;
+
+  --alarm: #a63b2d;
+  --alarm-soft: #f8e9e6;
+
+  --plum: #58355e;
+  --plum-soft: #f1eaf3;
+
+  --shadow-sm: 0 1px 2px rgba(60, 48, 32, 0.06);
+  --shadow: 0 2px 10px rgba(60, 48, 32, 0.09);
+  --shadow-lg: 0 10px 34px rgba(60, 48, 32, 0.16);
+
+  --serif: "Bodoni Moda", "Didot", Georgia, serif;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  /* Faint paper tooth, so the desk is not a flat colour field. */
+  background-image:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.55), transparent 45%),
+    radial-gradient(circle at 85% 70%, rgba(201, 186, 160, 0.18), transparent 50%);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+/* ---------------------------------------------------------------- shell -- */
+.desk {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.desk-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 350px;
+  gap: 20px;
+  padding: 20px 24px 32px;
+  max-width: 1680px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: start;
+}
+
+@media (max-width: 1240px) {
+  .desk-body { grid-template-columns: 270px minmax(0, 1fr); }
+  .col-right { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+}
+@media (max-width: 860px) {
+  .desk-body { grid-template-columns: 1fr; }
+  .col-right { grid-template-columns: 1fr; }
+}
+
+.col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+/* ----------------------------------------------------------- the sign -- */
+/* The motel sign. Serif caps, double rule, and a green glow that is only
+   "lit" when the backend is reachable — the sign is the health indicator. */
+.sign {
+  position: relative;
+  padding: 22px 28px 18px;
+  background: linear-gradient(180deg, #2c2a26 0%, #211f1c 100%);
+  border-bottom: 3px solid var(--brass);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.sign::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--brass), transparent);
+}
+
+.sign-mark { display: flex; align-items: baseline; gap: 14px; }
+.sign-mark h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #f6f1e6;
+  text-shadow: 0 0 18px var(--neon-glow);
+}
+.sign.lit .sign-mark h1 { color: #eafaf1; text-shadow: 0 0 22px rgba(42, 155, 108, 0.55); }
+.sign-mark .vacancy {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: #8f8678;
+  letter-spacing: 0.04em;
+}
+.sign.lit .sign-mark .vacancy { color: var(--neon-bright); }
+
+.sign-meta { display: flex; gap: 22px; align-items: center; }
+.sign-stat { text-align: right; }
+.sign-stat dt {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
+  color: #8f8678; margin-bottom: 3px;
+}
+.sign-stat dd { margin: 0; font-family: var(--mono); font-size: 15px; color: #f0e9dc; }
+
+.bulb {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #6e4a42; display: inline-block; margin-right: 7px;
+  vertical-align: middle;
+}
+.sign.lit .bulb {
+  background: var(--neon-bright);
+  box-shadow: 0 0 9px var(--neon-bright);
+  animation: flicker 4.5s infinite;
+}
+@keyframes flicker {
+  0%, 93%, 100% { opacity: 1; }
+  94% { opacity: 0.35; }
+  96% { opacity: 1; }
+  97% { opacity: 0.5; }
+}
+
+/* ---------------------------------------------------------------- cards -- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.card-head {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.card-head h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.card-head .hint { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em; }
+.card-body { padding: 14px 16px; }
+.card-body.flush { padding: 0; }
+
+/* -------------------------------------------------------------- tickets -- */
+.ticket {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 16px;
+  display: block;
+  transition: background 0.15s;
+}
+.ticket:last-child { border-bottom: none; }
+.ticket:hover { background: var(--paper-2); }
+.ticket.selected { background: var(--brass-soft); }
+.ticket.selected::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--brass);
+}
+
+.ticket-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.ticket-id { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+.ticket-subject { font-weight: 600; font-size: 15px; margin: 3px 0 2px; }
+.ticket-who { font-size: 12.5px; color: var(--ink-soft); }
+.ticket-want { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); margin-top: 5px; }
+
+.pill {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 3px 8px; border-radius: 20px; font-weight: 700; white-space: nowrap;
+}
+.pill.open { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--rule-strong); }
+.pill.waiting { background: var(--plum-soft); color: var(--plum); }
+.pill.resolved { background: #e6f4ec; color: var(--neon); }
+.pill.declined { background: var(--alarm-soft); color: var(--alarm); }
+.pill.live { background: var(--neon); color: #fff; }
+
+/* The resolved stamp. Rotated, slightly transparent, like a rubber stamp
+   rolled across the card after the fact. */
+.stamp {
+  position: absolute; right: 12px; bottom: 8px;
+  font-family: var(--serif); font-weight: 700;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--neon); border: 2px solid var(--neon);
+  padding: 2px 8px; border-radius: 3px;
+  transform: rotate(-8deg); opacity: 0.55;
+  pointer-events: none;
+}
+.stamp.declined { color: var(--alarm); border-color: var(--alarm); }
+
+/* ----------------------------------------------------------- the cast -- */
+.cast-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 700px) { .cast-row { grid-template-columns: repeat(2, 1fr); } }
+
+.cast {
+  --c: var(--ink-faint);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--c);
+  border-radius: 8px;
+  padding: 12px 11px 11px;
+  display: flex; flex-direction: column; gap: 7px;
+  transition: box-shadow 0.25s, transform 0.25s, opacity 0.25s;
+  opacity: 0.58;            /* dimmed until this character is in the scene */
+  min-width: 0;
+}
+.cast.active { opacity: 1; box-shadow: var(--shadow); transform: translateY(-2px); }
+.cast.spoke { opacity: 1; }
+
+.cast-face { display: flex; align-items: center; gap: 9px; }
+.avatar {
+  width: 34px; height: 34px; flex: none;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--serif); font-weight: 700; font-size: 13px;
+  letter-spacing: 0.04em;
+  background: var(--c); color: #fff;
+}
+.cast.active .avatar { box-shadow: 0 0 0 3px var(--neon-glow); }
+/* min-height holds two lines so a wrapped name ("Patrick Brewer") does not
+   shunt its job label out of line with the rest of the row. */
+.cast-name { font-weight: 650; font-size: 13px; line-height: 1.25; min-width: 0; }
+.cast-face > div:last-child { min-height: 33px; display: flex; flex-direction: column; justify-content: center; }
+.cast-job {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--ink-faint);
+}
+.cast-line {
+  font-size: 12px; color: var(--ink-soft); font-style: italic;
+  min-height: 2.6em; line-height: 1.3;
+}
+.cast-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 10.5px; color: var(--ink-faint);
+  border-top: 1px dashed var(--rule); padding-top: 6px;
+}
+.cast-count { font-family: var(--mono); }
+
+/* Three dots, for an agent mid-thought. */
+.dots { display: inline-flex; gap: 3px; align-items: center; }
+.dots i {
+  width: 4px; height: 4px; border-radius: 50%; background: var(--neon-bright);
+  animation: bounce 1.3s infinite;
+}
+.dots i:nth-child(2) { animation-delay: 0.18s; }
+.dots i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- feed -- */
+.feed {
+  max-height: 460px;
+  overflow-y: auto;
+  padding: 6px 0;
+  scroll-behavior: smooth;
+}
+.feed::-webkit-scrollbar { width: 8px; }
+.feed::-webkit-scrollbar-thumb { background: var(--rule-strong); border-radius: 4px; }
+
+.beat {
+  --c: var(--ink-faint);
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  padding: 7px 16px 7px 13px;
+  border-left: 3px solid transparent;
+  animation: slide-in 0.3s ease-out;
+}
+.beat.by-agent { border-left-color: var(--c); }
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Nested delegations sit further right, so depth is visible at a glance. */
+.beat.depth-1 { padding-left: 29px; }
+.beat.depth-2 { padding-left: 45px; }
+
+.beat-dot {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--c); color: #fff;
+  display: grid; place-items: center;
+  font-family: var(--serif); font-size: 9.5px; font-weight: 700;
+  margin-top: 2px;
+}
+.beat-main { min-width: 0; }
+.beat-who { font-weight: 650; font-size: 13px; }
+.beat-who small { font-weight: 400; color: var(--ink-faint); font-size: 11px; margin-left: 6px; }
+.beat-text { font-size: 13px; color: var(--ink-soft); word-wrap: break-word; }
+.beat-text em { color: var(--ink); font-style: normal; }
+
+.tool-chip {
+  display: inline-block;
+  font-family: var(--mono); font-size: 11px;
+  background: var(--paper); border: 1px solid var(--rule);
+  padding: 1px 6px; border-radius: 4px; color: var(--ink-soft);
+}
+.beat.is-handoff .beat-text { font-style: italic; }
+.beat.is-error { background: var(--alarm-soft); }
+.beat.is-error .beat-text { color: var(--alarm); }
+.beat.is-refusal { background: #fdf6ea; }
+
+.arrow { color: var(--brass); font-weight: 700; margin: 0 4px; }
+
+/* ----------------------------------------------------------- the ledger -- */
+/* Cash reads as a brass motel ledger: monospace, right-aligned, ruled. */
+.ledger-total {
+  text-align: center;
+  padding: 18px 12px 14px;
+  background: linear-gradient(180deg, var(--brass-soft), var(--card));
+  border-bottom: 1px solid var(--rule);
+}
+.ledger-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--ink-faint); margin-bottom: 4px;
+}
+.ledger-amount {
+  font-family: var(--mono); font-size: 34px; font-weight: 600;
+  letter-spacing: -0.02em; line-height: 1.1;
+}
+.ledger-amount.dropped { animation: cash-drop 1.3s ease-out; }
+@keyframes cash-drop {
+  0% { color: var(--alarm); transform: scale(1.12); }
+  40% { color: var(--alarm); }
+  100% { color: var(--ink); transform: scale(1); }
+}
+.ledger-delta {
+  font-family: var(--mono); font-size: 12.5px; color: var(--alarm);
+  margin-top: 3px; height: 1.2em;
+}
+
+.ledger-rows { font-size: 13px; }
+.ledger-row {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 7px 16px; border-bottom: 1px dashed var(--rule);
+}
+.ledger-row:last-child { border-bottom: none; }
+.ledger-row .who { color: var(--ink-soft); min-width: 0; }
+.ledger-row .who small { display: block; font-size: 11px; color: var(--ink-faint); }
+.ledger-row .amt { font-family: var(--mono); white-space: nowrap; }
+.ledger-row.overdue .amt { color: var(--alarm); font-weight: 600; }
+.ledger-row.paid .who { text-decoration: line-through; color: var(--ink-faint); }
+.ledger-row.paid .amt { color: var(--neon); }
+
+/* --------------------------------------------------------------- Moira -- */
+/* The approvals panel is Moira's domain. Plum, serif, and theatrical,
+   because it is the one place a human must actually do something. */
+.moira { border-color: var(--plum); border-top: 3px solid var(--plum); }
+.moira .card-head { background: var(--plum-soft); }
+.moira .card-head h2 { color: var(--plum); }
+
+.moira-intro { display: flex; gap: 11px; align-items: center; padding: 13px 16px 11px; }
+.moira-intro .avatar { background: var(--plum); width: 38px; height: 38px; font-size: 14px; }
+.moira-quote {
+  font-family: var(--serif); font-style: italic; font-size: 13.5px;
+  color: var(--plum); line-height: 1.35;
+}
+
+.ask {
+  border-top: 1px solid var(--rule);
+  padding: 13px 16px;
+}
+.ask-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ask-kind {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--plum); font-weight: 700;
+}
+.ask-amt { font-family: var(--mono); font-size: 18px; font-weight: 600; }
+.ask-summary { font-size: 13.5px; margin: 6px 0 4px; }
+.ask-why { font-size: 12px; color: var(--ink-soft); font-style: italic; }
+.ask-by { font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
+.ask-actions { display: flex; gap: 8px; margin-top: 11px; }
+
+.btn {
+  border: 1px solid var(--rule-strong);
+  background: var(--card);
+  color: var(--ink);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 13px; font-weight: 600;
+  transition: all 0.15s;
+}
+.btn:hover:not(:disabled) { border-color: var(--ink-soft); }
+.btn:disabled { opacity: 0.45; }
+.btn-approve { background: var(--plum); border-color: var(--plum); color: #fff; }
+.btn-approve:hover:not(:disabled) { background: #6b4172; }
+.btn-reject { color: var(--alarm); }
+.btn-primary { background: var(--neon); border-color: var(--neon); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--neon-bright); }
+.btn-ghost { background: none; border-color: var(--rule); color: var(--ink-soft); font-size: 12px; padding: 5px 10px; }
+
+.verdict {
+  margin-top: 9px; padding: 9px 11px; border-radius: 6px;
+  font-size: 12.5px; line-height: 1.4;
+}
+.verdict.ok { background: #e6f4ec; color: var(--neon); }
+.verdict.no { background: var(--alarm-soft); color: var(--alarm); }
+
+/* -------------------------------------------------------------- summary -- */
+.summary-card { border-top: 3px solid var(--neon); }
+.resolution {
+  font-size: 14px; line-height: 1.55;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+.resolution strong { display: block; font-family: var(--serif); font-size: 12px;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
+
+.did { display: flex; gap: 11px; padding: 11px 16px; border-bottom: 1px dashed var(--rule); }
+.did:last-child { border-bottom: none; }
+.did .avatar { width: 28px; height: 28px; font-size: 11px; flex: none; }
+.did-body { min-width: 0; }
+.did-who { font-weight: 650; font-size: 13px; }
+.did-what { font-size: 12.5px; color: var(--ink-soft); }
+.did-tools { margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+
+.run-stats {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  padding: 11px 16px; border-top: 1px solid var(--rule);
+  background: var(--paper-2); font-size: 11.5px; color: var(--ink-faint);
+}
+.run-stats b { font-family: var(--mono); color: var(--ink-soft); font-weight: 600; }
+
+/* ---------------------------------------------------------------- misc -- */
+.empty {
+  padding: 34px 20px; text-align: center; color: var(--ink-faint);
+  font-family: var(--serif); font-style: italic; font-size: 14px;
+}
+.banner {
+  padding: 10px 16px; border-radius: 8px; font-size: 13px;
+  display: flex; align-items: center; gap: 9px;
+}
+.banner.bad { background: var(--alarm-soft); color: var(--alarm); border: 1px solid #e8c4bd; }
+
+.toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+
+.facts { padding: 11px 16px; border-top: 1px dashed var(--rule); }
+.facts h4 {
+  margin: 0 0 6px; font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--ink-faint); font-weight: 700;
+}
+.facts li { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); margin-bottom: 3px; }
+.facts ul { margin: 0; padding-left: 16px; }
+
+.footnote {
+  text-align: center; padding: 10px 24px 4px;
+  font-size: 11.5px; color: var(--ink-faint);
+}

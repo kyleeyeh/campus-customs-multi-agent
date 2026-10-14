@@ -1,0 +1,34 @@
+# Secrets -- never commit
+.env
+
+# Machine-local editor settings. .mcp.json IS committed (it is the project's
+# MCP config and graders may want it); everything under .claude/ is specific to
+# one machine -- an approval record and a dev-server launch config.
+.claude/
+
+# BOTH database files are committed on purpose.
+#
+#   data/campus_customs.db      the pristine original — never written to
+#   data/campus_customs_new.db  the working copy, as the agents left it
+#
+# Shipping the working copy means a grader can clone and immediately see the
+# three tickets resolved and the $160.00 ending balance without running the
+# agents or spending a token. `python scripts/init_working_db.py` restores it
+# from the original whenever a clean run is wanted.
+data/*.db-journal
+data/*.db-wal
+
+venv/
+__pycache__/
+*.pyc
+node_modules/
+dashboard/dist/
+.DS_Store
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# Restore point for the resolved board (regenerate with scripts/full_run.py)
+output/snapshot/
