@@ -67,22 +67,22 @@ SCORECARD: dict[int, list[tuple[str, bool | None, str]]] = {
     101: [
         ("Boss calls inventory first", True, "It did — stock was the branch-decider, as argued."),
         ("Facilities not involved", True, "Never called. Rent appeared only inside get_cash_position."),
-        ("Three delegations", True, "Three: inventory, customer_service, accounting — all fanned out from the boss."),
+        ("Three delegations", True, "Three: inventory, customer_service, accounting — all from the boss."),
         (
             "Inventory delegates straight to accounting",
             False,
-            "Flagged as the least certain call, and it was wrong again: inventory reported back "
-            "and the boss routed to accounting itself.",
+            "Flagged as the least certain call, and wrong on every run so far: inventory "
+            "reported back and the boss routed to accounting itself.",
         ),
         (
             "Customer service drafts a reply",
             True,
-            "Draft #1 to Tauhid Zaman — says size S is unavailable, promises no shipment, and "
-            "commits only to following up.",
+            "Draft #1 to Tauhid Zaman — says size S is unavailable, promises no shipment, "
+            "and commits only to following up.",
         ),
         ("Shortfall of 1, blocked by invoice 501 ($840)", True, "Exactly that."),
-        ("No purchase order raised", True, "None attempted, as expected while the vendor was blocked."),
-        ("Agents move $0.00", True, "Approval parked; nothing paid until a human decided."),
+        ("No purchase order raised", True, "None attempted; the vendor was blocked anyway."),
+        ("Agents move $0.00", True, "Approval parked; the $840 moved only when a human clicked."),
     ],
     102: [
         ("Boss calls facilities first", True, "Straight there — only lease_id was populated."),
@@ -98,30 +98,30 @@ SCORECARD: dict[int, list[tuple[str, bool | None, str]]] = {
         (
             "Boss calls inventory first",
             True,
-            "Right this time. The plan named this its least confident call; the run opened "
-            "boss → inventory exactly as predicted.",
+            "Right again. The plan named this its least confident call; both recent runs "
+            "opened boss → inventory.",
         ),
         (
             "Three delegations",
             False,
-            "Five — and two of them were specialist-to-specialist: customer_service → "
-            "accounting and customer_service → inventory, without passing back through the boss.",
+            "Seven across two runs — five before the human decided, then two more on the "
+            "closing run. Two were specialist-to-specialist: customer_service → accounting "
+            "and customer_service → inventory, without passing back through the boss.",
         ),
         ("Facilities not involved", True, "Correctly left out."),
         (
             "Discount floor of $36.67/unit",
             None,
-            "The floor was computed exactly — evaluate_discount returned $36.67 as the lowest "
-            "price meeting the 40% margin. But the shop approved the customer's own $40.00 "
-            "offer (45% margin, $800 for 20) rather than countering down to the floor.",
+            "The floor was computed exactly — $22 cost ÷ 0.6 — but it is a floor, not the "
+            "price. The shop checked the customer's $49.00 offer against it and approved "
+            "that: 55.1% margin, $980 for twenty.",
         ),
-        ("Shortfall of 12, restock $264", True, "8 of 20 on hand; find_restock_vendor priced the 12-unit gap at $264."),
+        ("Shortfall of 12, restock $264", True, "8 of 20 on hand; the 12-unit gap priced at $264."),
         (
             "A purchase order is attempted and refused",
-            False,
-            "No purchase order was attempted at all this time. Accounting reasoned ahead of the "
-            "tool — it ruled the $264 restock unfundable against the $250 reserve and never "
-            "called create_purchase_order. purchase_orders is empty either way.",
+            True,
+            "Raised as approval #5, approved by a human, and then not funded — $264 against "
+            "$160 with a $250 reserve. The purchase_orders row stays at draft; no cash moved.",
         ),
         (
             "Customer service drafts a reply",
@@ -131,10 +131,17 @@ SCORECARD: dict[int, list[tuple[str, bool | None, str]]] = {
         (
             "A duplicate $840 approval may be raised",
             True,
-            "It was — approval #4, again. A human approved it and pay_invoice still refused, "
-            "because invoice 501 had already been settled by approval #1.",
+            "It was — approval #4, for a third run running. A human approved it and "
+            "pay_invoice still refused, because invoice 501 was already settled by approval #1.",
         ),
         ("Agents move $0.00", True, "Nothing moved on this ticket at all."),
+        (
+            "The ticket ends resolved",
+            False,
+            "It ended declined. With the restock unfundable the shop could not do what was "
+            "asked, and declined with a reason is the honest close — but it is not the "
+            "status the plan expected.",
+        ),
     ],
 }
 
@@ -219,6 +226,47 @@ def cash_tab(doc: dict) -> str:
             f"<td>{why}</td></tr>"
         )
 
+    # Whether the approver happened to follow the written priority (rent before
+    # vendor invoices) is a fact about this run, so it is read rather than
+    # asserted. Paying out of priority changes the intermediate balances even
+    # though the ending figure is the same.
+    paid_kinds = [
+        p["kind"]
+        for t in sorted(doc["tickets"], key=lambda t: t["cash"]["balance_before"], reverse=True)
+        for p in t["payments_executed"]
+    ]
+    if paid_kinds[:2] == ["rent", "invoice"]:
+        priority_note = (
+            "Rent went first here, which is what the written priority asks for: "
+            "losing the premises ends the business."
+        )
+    elif "rent" in paid_kinds and "invoice" in paid_kinds:
+        priority_note = (
+            "The overdue vendor invoice was approved before the rent, which inverts the "
+            "written priority. The ending balance is unaffected — both were affordable — but "
+            "had cash been tighter, paying the smaller bill first could have left the rent "
+            "short."
+        )
+    else:
+        priority_note = ""
+
+    # One line per executed payment, in the order the payments were actually
+    # made, with the real payment id. Hardcoding "rent is payment #1" held only
+    # while rent happened to be approved first.
+    DESCRIBE = {
+        "rent": "Rent — lease {ref}, Elm City Properties",
+        "invoice": "Invoice {ref} — Bulldog Print Co, overdue",
+    }
+    payment_lines = "\n    ".join(
+        "<tr><td>{desc} (payment #{pid})</td>"
+        '<td class="num">−{amt}</td></tr>'.format(
+            desc=DESCRIBE.get(p["kind"], p["kind"].title()).format(ref=p["ref_id"]),
+            pid=p["id"],
+            amt=money(p["amount"]),
+        )
+        for p in doc["all_payments"]
+    )
+
     chk = doc["arithmetic_check"]
     # The approved discount, read off the approval itself. The agents choose the
     # price inside the margin floor, so it can differ run to run — quoting the
@@ -226,8 +274,15 @@ def cash_tab(doc: dict) -> str:
     disc = next(
         a for t in doc["tickets"] for a in t["human_approvals"] if a["kind"] == "discount"
     )
-    disc_qty = (disc.get("payload") or {}).get("qty")
-    disc_unit = (disc.get("payload") or {}).get("unit_price")
+    # The agents have written this payload both ways across runs — `unit_price`
+    # when the shop set the price, `proposed_unit_price` when it was checking
+    # the customer's offer. Falling back to amount ÷ qty keeps the sentence
+    # truthful if a third spelling turns up.
+    _dp = disc.get("payload") or {}
+    disc_qty = _dp.get("qty")
+    disc_unit = _dp.get("unit_price") or _dp.get("proposed_unit_price")
+    if disc_unit is None and disc_qty:
+        disc_unit = round(disc["amount"] / disc_qty, 2)
 
     # A payment approval that a human approved but which produced no payment
     # row was refused by the pay tool. That is the most interesting line in the
@@ -259,9 +314,9 @@ def cash_tab(doc: dict) -> str:
   </div>
 
   <h3>How cash changed, ticket by ticket</h3>
-  <p class="note">Listed in the order the money actually moved. Rent was paid first because the
-  shop's written payment priority ranks rent above vendor invoices — not because ticket 102 was
-  worked first.</p>
+  <p class="note">Listed in the order the money actually moved, which is the order the approver
+  clicked — not the order the tickets were worked, and not necessarily the shop's written
+  payment priority. {priority_note}</p>
   <table>
     <tr><th>Ticket</th><th>Subject</th><th>Before</th><th>Change</th><th>After</th><th>Why</th></tr>
     {''.join(rows)}
@@ -271,8 +326,7 @@ def cash_tab(doc: dict) -> str:
   <table>
     <tr><th>Line</th><th>Amount</th></tr>
     <tr><td>Starting balance</td><td class="num">{money(doc['starting_checking_balance'])}</td></tr>
-    <tr><td>Rent — lease 1, Elm City Properties (payment #1)</td><td class="num">−{money(2400.0)}</td></tr>
-    <tr><td>Invoice 501 — Bulldog Print Co, overdue (payment #2)</td><td class="num">−{money(840.0)}</td></tr>
+    {payment_lines}
     <tr><td><strong>Total paid out</strong></td><td class="num"><strong>−{money(doc['total_paid'])}</strong></td></tr>
     <tr><td><strong>Ending balance</strong></td><td class="num"><strong>{money(doc['ending_checking_balance'])}</strong></td></tr>
   </table>

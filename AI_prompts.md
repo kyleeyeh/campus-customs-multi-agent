@@ -817,7 +817,7 @@ configuration.
 
 **Verified by cloning it.** The repository was cloned fresh into a scratch
 directory and checked as a grader would see it: the shipped working database
-reads $160.00 with all three tickets resolved and both payments recorded against
+reads $160.00 with the board closed out and both payments recorded against
 Kyle Yeh; the pristine original still reads $3,400.00 with three open tickets
 and no payments; `python scripts/init_working_db.py` runs from the clean clone
 and restores the board to $3,400.00; and there is no `.env`, only
@@ -908,6 +908,38 @@ ticket, wait for its agent summary to render, capture full-page. Shot at 1.5×
 rather than 2× after the first pass produced a 3 MB page for no readability
 gain. The script lives outside the repo so the submission does not grow a
 browser-automation dependency it never needs at runtime.
+
+### Follow-up 4 (approvals by hand)
+
+> Reset and re-run, then I'll click each approval in the dashboard myself so
+> decided_by comes from real clicks.
+
+Reset, re-ran the three tickets, and stopped before any approval. Five requests
+parked; I clicked all five in the dashboard. Every `decided_by` and
+`payments.approved_by` on the submitted board is now a real click.
+
+Two things came out of it that the scripted pass had hidden.
+
+**Ticket 103 declined.** I approved the $264 purchase order and the tool still
+refused to fund it — $160 cash against a $250 reserve. With the restock
+impossible the boss closed the ticket `declined` rather than `resolved`. That is
+the honest answer and I kept it, even though the assignment's wording leans
+toward resolved: the shop genuinely cannot do what was asked, and the customer
+draft says so.
+
+**I approved the invoice before the rent**, inverting the shop's own payment
+priority. Same ending balance, different intermediate figures — and with less
+cash it could have left the rent short. The Cash tab now reads the order out of
+the data and says which happened.
+
+**And it exposed a real cash bug.** The per-ticket column had been attributing
+payments through `full_run_capture.json`, which only gets written when
+`full_run.py` drives the pass. Approving by hand left it stale, so ticket 101
+was charged $2,400 and ticket 102 $840 — backwards. The ending balance still
+reconciled to $160.00, which is exactly why this kind of error survives a
+glance. Attribution now matches each payment to the approval that authorised it,
+straight from the database, and `scripts/capture_pass.py` rebuilds the capture
+after a hand-approved pass.
 
 ---
 

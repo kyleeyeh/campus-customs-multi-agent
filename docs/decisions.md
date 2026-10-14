@@ -283,12 +283,28 @@ weaker: ticket 103 never called `create_purchase_order` at all, where the
 earlier run put it to the tool and had it refused. Same conclusion, less
 evidence. Recorded rather than smoothed over.
 
-**One caveat on the approvals.** The earlier pass's approvals were clicked by
-hand in the dashboard. This pass's were executed by `scripts/full_run.py`
-against the same human approve route, in payment-priority order, with
-`decided_by` set to the shop owner. No agent can reach that route either way, so
-the boundary holds — but these `decided_by` values came from the script rather
-than a click.
+**The approvals were then redone by hand.** The board was reset once more, the
+agents re-run, and all five requests clicked through the dashboard one at a
+time, so every `decided_by` on the submitted board comes from a real click. Two
+consequences worth recording:
+
+| What changed | Why it matters |
+|---|---|
+| Ticket 103 closed **declined**, not resolved | The approver granted the $264 purchase order, and the tool still refused to fund it against $160 with a $250 reserve. With the restock impossible, declining with a reason is the honest close. The board now shows two resolved and one declined. |
+| The invoice was approved **before** the rent | That inverts the written payment priority. The ending balance is identical because both were affordable, but the intermediate figures differ, and with tighter cash the rent could have been left short. The Cash tab now reads the order out of the data and says which happened instead of asserting rent-first. |
+
+**Two bugs the hand-approved pass exposed.** Both were invisible while
+`full_run.py` drove the approvals:
+
+| Bug | Fix |
+|---|---|
+| Per-ticket cash was attributed through `full_run_capture.json`, which only exists when the script drove the pass. Approving by hand left it stale, so the $840 was charged to the rent ticket and the $2,400 to the invoice ticket — while the *ending* balance still reconciled, which is exactly what makes this class of error easy to miss. | Attribution now matches each payment to the approval that authorised it, read from the database: tool name for the kind, then `invoice_id` / `lease_id` / `ref_id` for the reference, earliest decision first so ticket 103's refused duplicate cannot claim ticket 101's payment. |
+| Run scoping also came from that capture, so the write-up quoted the *previous* pass's delegation chains and tool counts. | `scripts/capture_pass.py` rebuilds the capture from the database and the trail, anchored on the earliest row written since the last reset. |
+
+**A third spelling of the discount.** The agents have proposed $36.67, $40.00
+and $49.00 across three runs — all above the floor, all legitimate. Anything
+quoting a discount figure now reads it from the approval payload, accepting
+`unit_price` or `proposed_unit_price` and falling back to amount ÷ qty.
 
 ## Standing working rules
 

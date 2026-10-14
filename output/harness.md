@@ -876,50 +876,42 @@ run.
 ## Problem 9 — The full run
 
 Database reset first with `python scripts/init_working_db.py`, then all three
-tickets worked to resolution. Driven by `scripts/full_run.py`.
+tickets worked. The agents were driven from the board; **every approval on this
+pass was clicked by hand in the dashboard**, one at a time.
 
 **Starting checking balance: $3,400.00** · ending **$160.00** · model cost
-$0.0086 for the pass.
+$0.0104 for the pass.
 
 ### What happened
 
 | Ticket | Boss called first | Chain | Agents | Approval | Cash |
 |---|---|---|---|---|---|
-| **101** Bulldog tee | inventory | boss → inventory, boss → customer_service, boss → accounting | 4 | #1 payment $840 | $1,000 → **$160** |
-| **102** Rent due | facilities | boss → facilities | 2 | #2 payment $2,400 | $3,400 → **$1,000** |
-| **103** Bulk hoodie | inventory | boss → inventory, boss → customer_service, **customer_service → accounting**, **customer_service → inventory**, boss → accounting | 4 | #3 discount $800 · #4 payment $840 **refused** | $160 → **$160** |
+| **101** Bulldog tee | inventory | boss → inventory, boss → customer_service, boss → accounting | 4 | #1 payment $840 | $3,400 → **$2,560** |
+| **102** Rent due | facilities | boss → facilities | 2 | #2 payment $2,400 | $2,560 → **$160** |
+| **103** Bulk hoodie | inventory | 7 hops over two runs, incl. **customer_service → accounting** and **customer_service → inventory** | 4 | #3 discount $980 · #4 payment $840 **refused** · #5 purchase order $264 **not funded** | $160 → **$160** |
 
-Every ticket closed in a **single pass** this time — no ticket had to be re-run
-against the settled board. Ticket 103 is also the first run on this board where
-delegation went specialist-to-specialist rather than always through the boss:
-customer service called accounting for a price and inventory for availability on
-its own initiative.
+Tickets 101 and 102 closed `resolved`. **Ticket 103 closed `declined`** — the
+shop can supply 8 of the 20 hoodies and cannot fund the $264 restock that would
+close the gap, so it refused the request with a reason and a drafted
+explanation rather than recording a resolution it could not deliver.
 
-All three ended `resolved`. **The agents moved $0.00.** Every dollar that moved
-did so through `POST /approvals/{id}/approve` after a human decided.
+**The agents moved $0.00.** Every dollar that moved did so through
+`POST /approvals/{id}/approve` after a human clicked Approve.
 
-**How the approvals were made.** On the earlier pass they were clicked by hand
-in the dashboard, one at a time. On this pass `scripts/full_run.py` called the
-same approve route in the shop's payment priority order — rent, then the overdue
-invoice — with `decided_by` set to the shop owner. The route is the same one the
-Approve button calls and no agent can reach it, so the human-approval boundary
-holds either way; but these particular `decided_by` values came from the script,
-not from a click, and that is worth knowing when reading the ledger.
-
-An earlier bug worth keeping on the record: because the approve route once
-closed a ticket only when the execution *succeeded*, the refused duplicate on
-103 skipped the close and stranded the ticket at `waiting_approval` with nothing
-pending — the exact unreachable state `update_ticket` rejects. The route now
-turns on the state of the queue rather than the success of one execution, which
-is why 103 closes cleanly here.
+**The approver did not follow the written payment priority.** The overdue
+vendor invoice (#1) was approved before the rent (#2). The ending balance is
+unaffected because both were affordable, but the intermediate balances differ
+from a rent-first ordering, and with less cash on hand paying the smaller bill
+first could have left the rent short. The Cash tab says so explicitly rather
+than presenting the ledger as if priority had been followed.
 
 ### The cash, reconciled
 
 | | |
 |---|---|
 | Starting balance | $3,400.00 |
-| Rent — lease 1, Elm City Properties (payment #1) | −$2,400.00 |
-| Invoice 501 — Bulldog Print Co, overdue (payment #2) | −$840.00 |
+| Invoice 501 — Bulldog Print Co, overdue (payment #1) | −$840.00 |
+| Rent — lease 1, Elm City Properties (payment #2) | −$2,400.00 |
 | **Total paid** | **−$3,240.00** |
 | **Ending balance** | **$160.00** |
 
@@ -927,39 +919,42 @@ $3,400.00 − $3,240.00 = $160.00, and `cash_accounts.balance` in
 `data/campus_customs_new.db` reads **$160.00**. The per-ticket figures also sum
 to −$3,240.00, so nothing is double-counted or missing.
 
-Two things deliberately did **not** move cash:
+Three things deliberately did **not** move cash:
 
-- **Approval #3** approved a bulk discount at **$40.00/unit** ($800.00 for 20
-  units) — the price the customer asked for, checked against the floor rather
-  than waved through: 45% gross margin against a 40% minimum, where the lowest
+- **Approval #3** approved a bulk discount at **$49.00/unit** ($980.00 for 20
+  units) — the customer's own offer, checked against the floor rather than
+  waved through: 55.1% gross margin against a 40% minimum, where the lowest
   compliant price would have been $36.67. A discount is a price, not a payment.
-  Counting its headline figure as spending would have overstated outgoings by
-  $800.00 — and an early version of the checking script did exactly that.
-- **Approval #4** asked to pay invoice 501 a *second* time. A human approved it,
-  and `pay_invoice` **refused** because the invoice was already settled. This is
-  the double-payment guard firing in a real run rather than in a test, and it
-  has now fired on two independent runs.
+- **Approval #4** asked to pay invoice 501 a *second* time. A human approved it
+  and `pay_invoice` **refused**, because the invoice was already settled by
+  approval #1. Three runs, three duplicates, three refusals.
+- **Approval #5** approved the $264 purchase order. It was **not funded** —
+  $264 against $160 with a $250 discretionary reserve — leaving a `draft` row in
+  `purchase_orders` and the balance untouched.
+
+The last two are the strongest evidence on this board: both were stopped by the
+MCP server *after* a human had already said yes. The guard is in the tool, not
+in the prompt and not in the dashboard.
 
 ### Plan versus run
 
 Scored in full on each ticket tab of `desk_tickets.html`.
 
-- **102 went exactly as planned**, on both runs — one delegation, facilities
+- **102 went exactly as planned**, on every run — one delegation, facilities
   alone, accounting and customer service correctly excluded.
-- **101 matched the plan for the first time.** Inventory first, facilities
-  excluded, the shortfall of 1 and the $840 blocker all as predicted — and this
-  run produced the three delegations and the customer draft the plan expected.
-  Draft #1 went to **Tauhid Zaman**, the gap that defined the previous pass.
+- **101 matched the plan.** Inventory first, facilities excluded, the shortfall
+  of 1 and the $840 blocker as predicted, three delegations, and the customer
+  draft to **Tauhid Zaman**. The one persistent miss is that the plan had
+  inventory handing off straight to accounting; every hop went via the boss.
 - **103 opened as predicted and then outgrew the plan.** Inventory first, which
-  the plan had named its least confident call. But three expected delegations
-  became five, two of them specialist-to-specialist, and no purchase order was
-  attempted at all — accounting ruled the $264 restock unfundable against the
-  $250 reserve without putting it to `create_purchase_order`.
-- **The data predictions held across both runs** — the shortfalls, the $840, the
-  $36.67 floor, the $264 restock. The duplicate $840 approval the plan listed as
-  a risk happened on both runs too.
-- **Where the plan stays unreliable is routing.** Which agent acts when changed
-  between runs even though the database did not.
+  the plan called its least confident prediction. But three expected delegations
+  became seven across two runs, two of them specialist-to-specialist, and the
+  plan assumed a `resolved` close where the run `declined`.
+- **The data predictions have held on every run** — the shortfalls, the $840,
+  the $36.67 floor, the $264 restock. So has the duplicate $840 approval the
+  plan listed as a risk.
+- **Routing stays the unreliable part.** Which agent acts when, and even the
+  final status, changed between runs while the database did not.
 
 ---
 
@@ -1101,18 +1096,25 @@ that on ticket 101 the team established exactly why it could not supply Tauhid
 Zaman and then wrote nothing. The draft is now owed to any ticket with a named
 `requester`, bad news included, and the close step checks for it.
 
-**The board was then reset and re-run end to end to prove it.** Ticket 101 now
-delegates to customer service and writes draft #1 to Tauhid; every figure above,
-the ticket tabs, the Cash tab and the Reflection describe that run. The ledger
-still reconciles to $160.00. Two things got better without being asked for —
-every ticket closed in a single pass, and customer service began delegating to
-other specialists directly — and one thing got weaker: 103 never put its
-purchase order to the tool, where the earlier run did and was refused. Both are
-recorded rather than smoothed over.
+**The board was then reset and re-run end to end to prove it**, twice. The
+second of those is the pass described above: the agents worked the board, the
+five requests were clicked through the dashboard by hand, and ticket 103 was
+re-run afterwards to close against the settled board. Ticket 101 now delegates
+to customer service and writes draft #1 to Tauhid. The ledger reconciles to
+$160.00.
 
-One caveat on this pass, stated plainly: its approvals were executed by
-`scripts/full_run.py` against the human approve route, not clicked one at a time
-in the dashboard as the earlier pass's were.
+Re-running surfaced two bugs in the write-up pipeline that no single run would
+have shown:
+
+- **Payments were attributed to tickets through the run capture.** That file is
+  only written by `full_run.py`, so approving by hand left it stale and the
+  per-ticket cash column pointed the $840 at the rent ticket and the $2,400 at
+  the invoice ticket. Attribution now matches each payment to the approval that
+  authorised it, read from the database. `scripts/capture_pass.py` rebuilds the
+  capture for a hand-approved pass so run scoping stays correct too.
+- **Figures were hardcoded in the prose.** The approved discount has come out at
+  $36.67, $40.00 and $49.00 on three runs. Counts now derive from
+  `audit_trail.json` and prices from the approval payload.
 
 ---
 

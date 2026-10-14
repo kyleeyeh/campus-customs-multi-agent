@@ -12,8 +12,9 @@
 #   data/campus_customs_new.db  the working copy, as the agents left it
 #
 # Shipping the working copy means a grader can clone and immediately see the
-# three tickets resolved and the $160.00 ending balance without running the
-# agents or spending a token. `python scripts/init_working_db.py` restores it
+# closed board (101 and 102 resolved, 103 declined) and the $160.00 ending
+# balance without running the agents or spending a token.
+# `python scripts/init_working_db.py` restores it
 # from the original whenever a clean run is wanted.
 data/*.db-journal
 data/*.db-wal

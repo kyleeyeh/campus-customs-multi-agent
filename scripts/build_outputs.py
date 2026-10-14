@@ -143,6 +143,77 @@ def main() -> int:
     drafts = rows(conn, "SELECT * FROM drafts ORDER BY id")
     pos = rows(conn, "SELECT * FROM purchase_orders ORDER BY id")
 
+    # --- payment attribution -------------------------------------------
+    #
+    # `payments` has no `approval_id` column, so each payment is matched back
+    # to the approval that authorised it: same kind, same reference, approved,
+    # earliest decision first. That matters because ticket 103 also raised a
+    # request against invoice 501 — it was REFUSED, since the invoice was
+    # already settled, but its payload still points at invoice 501. Matching on
+    # the reference alone would credit one payment to two tickets and make the
+    # per-ticket column sum to more than the shop spent.
+    #
+    # This is read from the database rather than from the run capture on
+    # purpose. The capture only exists when `full_run.py` drove the approvals;
+    # when a human clicks Approve in the dashboard instead, it is stale, and
+    # the order payments land in is whatever order the human chose.
+    # The tool name is the dependable signal for what kind of obligation this
+    # is; the reference key is not. `pay_invoice` carries `invoice_id` while
+    # `pay_rent` carries `ref_id`, so matching on key names alone silently
+    # drops the rent payment and makes the per-ticket column under-sum.
+    PAY_TOOLS = {"pay_invoice": "invoice", "pay_rent": "rent"}
+    REF_KEYS = ("invoice_id", "lease_id", "ref_id")
+
+    def _ref_of(approval: dict) -> tuple[str, int] | None:
+        payload = json.loads(approval.get("payload") or "{}")
+        kind = PAY_TOOLS.get(payload.get("tool", ""))
+        if kind is None:
+            return None
+        for key in REF_KEYS:
+            if payload.get(key) is not None:
+                return kind, int(payload[key])
+        return None
+
+    used: set[int] = set()
+    payment_ticket: dict[int, int] = {}
+    payment_time: dict[int, str] = {}
+    for pay in payments:
+        want = (pay["kind"], pay["ref_id"])
+        for a in sorted(
+            (x for x in approvals if x["status"] == "approved" and x["id"] not in used),
+            key=lambda x: (x.get("decided_at") or "", x["id"]),
+        ):
+            if _ref_of(a) == want:
+                used.add(a["id"])
+                payment_ticket[pay["id"]] = a["ticket_id"]
+                payment_time[pay["id"]] = a.get("decided_at") or ""
+                break
+
+    # Walk the payments once, in the order they were made, to get the balance
+    # either side of each. The ending figure is still read from the database.
+    bracket: dict[int, dict[str, float]] = {}
+    walk = starting
+    for pay in payments:
+        bracket[pay["id"]] = {"before": walk, "after": round(walk - pay["amount"], 2)}
+        walk = round(walk - pay["amount"], 2)
+
+    def balance_at(ticket_id: int) -> float:
+        """Balance as of this ticket's last human decision."""
+        decided = [
+            a.get("decided_at")
+            for a in approvals
+            if a["ticket_id"] == ticket_id and a.get("decided_at")
+        ]
+        if not decided:
+            return walk
+        cutoff = max(decided)
+        spent = sum(
+            pay["amount"]
+            for pay in payments
+            if payment_time.get(pay["id"], "") <= cutoff
+        )
+        return round(starting - spent, 2)
+
     tickets_out = []
     running = starting
 
@@ -152,41 +223,18 @@ def main() -> int:
 
         t_approvals = [a for a in approvals if a["ticket_id"] == tid]
 
-        # Attribute each payment to exactly ONE ticket.
-        #
-        # Matching on the payload's reference alone double-counts: ticket 103
-        # also raised a request to pay invoice 501, and although that request
-        # was REFUSED (the invoice was already settled), its payload still
-        # points at invoice 501. Crediting the payment to both tickets would
-        # make the per-ticket column sum to more than the shop actually spent.
-        #
-        # The run capture records which approval produced which payment row, so
-        # a payment belongs to the ticket whose approval actually executed.
-        paid_by_ticket = {
-            row["payment_id"]: row["ticket_id"]
-            for row in capture.get("ledger", [])
-            if row.get("executed") and row.get("payment_id")
-        }
-        t_payments = [p for p in payments if paid_by_ticket.get(p["id"]) == tid]
+        t_payments = [p for p in payments if payment_ticket.get(p["id"]) == tid]
         cash_delta = -sum(p["amount"] for p in t_payments)
 
-        # Balances are taken from the run capture, which recorded them either
-        # side of each approval as it executed. Walking the tickets in id order
-        # and subtracting as we go would report the wrong intermediate figures:
-        # rent (ticket 102) was paid BEFORE the invoice (ticket 101), because
-        # the shop's payment priority puts rent first. The ending balance would
-        # still come out right, which is exactly what makes that kind of error
-        # easy to miss.
-        # Every decision on this ticket brackets the balance, including ones
-        # that were refused — ticket 103's second request was refused (invoice
-        # already paid) and moved nothing, but it still tells us what the
-        # balance was when the shop looked at it. Only executed rows feed the
-        # delta; all rows feed the before/after bracket.
-        my_rows = [r for r in capture.get("ledger", []) if r.get("ticket_id") == tid]
-        if my_rows:
-            before = my_rows[0]["balance_before"]
-            running = my_rows[-1]["balance_after"]
+        # Balances bracket the ticket's own payments, walked in the order the
+        # money actually moved (payment id order). A ticket that moved nothing
+        # is shown at the balance as of its last decision, so ticket 103 reads
+        # $160 either side rather than pretending it saw the opening $3,400.
+        if t_payments:
+            before = bracket[t_payments[0]["id"]]["before"]
+            running = bracket[t_payments[-1]["id"]]["after"]
         else:
+            running = balance_at(tid)
             before = running
 
         tickets_out.append(

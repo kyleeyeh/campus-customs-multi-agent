@@ -17,10 +17,11 @@ Every agent reaches the shop through MCP tools. Nothing in the backend opens the
 database to answer a question, so there is exactly one place the shop's rules
 are enforced.
 
-**The headline result:** the three tickets on the board were worked to
-resolution, the agents moved **$0.00**, and the $3,240.00 that did move went
-through a human clicking Approve. Starting balance $3,400.00, ending balance
-**$160.00**, reconciled against `cash_accounts`. See
+**The headline result:** all three tickets on the board were worked to a close
+— two `resolved`, and ticket 103 `declined` because the shop cannot fund the
+restock it would need. The agents moved **$0.00**; the $3,240.00 that did move
+went through a human clicking Approve. Starting balance $3,400.00, ending
+balance **$160.00**, reconciled against `cash_accounts`. See
 [`output/desk_tickets.html`](output/desk_tickets.html).
 
 ---
@@ -66,8 +67,8 @@ data/campus_customs_new.db   the working copy — everything happens here
 ```
 
 Both are committed. The working copy ships **as the agents left it**, so you can
-clone this repo and immediately see three resolved tickets and a $160.00
-balance without running anything.
+clone this repo and immediately see the closed board — 101 and 102 resolved, 103
+declined — and a $160.00 balance, without running anything.
 
 ### Copy the original over the working copy for a clean run
 
@@ -193,7 +194,7 @@ python scripts/test_guardrails.py    # 19/19, deterministic, no model calls
 | File | |
 |---|---|
 | [`output/desk_tickets.html`](output/desk_tickets.html) | **Start here.** The plan, what actually happened, the itemised cash, and the reflection. |
-| [`output/resolved_board.html`](output/resolved_board.html) | Screenshots of the dashboard for each resolved ticket. |
+| [`output/resolved_board.html`](output/resolved_board.html) | Screenshots of the dashboard for each closed ticket. |
 | [`output/harness.md`](output/harness.md) | Tables, tools, agents, routes, dashboard, safety rules. |
 | [`output/resolved_tickets.json`](output/resolved_tickets.json) | Machine-readable outcome per ticket. |
 | [`output/audit_trail.json`](output/audit_trail.json) | Every agent step across every run, append-only. |

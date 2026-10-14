@@ -1,282 +1,121 @@
 {
+  "captured_at": "2026-10-14T17:37:52",
+  "source": "scripts/capture_pass.py (approvals decided in the dashboard)",
+  "anchor": "2026-10-14 21:19:14",
   "starting_balance": 3400.0,
   "ending_balance": 160.0,
-  "ledger": [
+  "runs": [
     {
-      "approval_id": 2,
-      "ticket_id": 102,
-      "kind": "payment",
-      "summary": "Approve $2,400 rent payment to Elm City Properties for Chapel Street shop, due 2026-09-02.",
-      "requested_by": "facilities",
-      "amount": 2400.0,
-      "executed": true,
-      "payment_id": 1,
-      "paid_at": "2026-08-31",
-      "approved_by": "Kyle Yeh",
-      "balance_before": 3400.0,
-      "balance_after": 1000.0,
-      "ticket_closed": true
+      "ticket_id": 101,
+      "run_id": "run-101-6907c40e",
+      "started_at": "2026-10-14T21:24:11+00:00",
+      "result": {
+        "cost_usd": 0.003039425,
+        "duration_ms": 12264,
+        "summary": "Size S is out of stock (shortfall 1). Bulldog Print Co will not ship while invoice 501 remains open, and accounting has raised pending approval 1 for its $840 payment; no payment or restock has been made. The customer reply is drafted; if the invoice is paid, a one-unit restock would cost $8 and arrive no earlier than 2026-09-05."
+      }
     },
+    {
+      "ticket_id": 102,
+      "run_id": "run-102-467db6c6",
+      "started_at": "2026-10-14T21:24:28+00:00",
+      "result": {
+        "cost_usd": 0.00091221,
+        "duration_ms": 18649,
+        "summary": "Lease 1 rent of $2,400 for the Chapel Street shop is due 2026-09-02 and remains unpaid. Facilities raised pending approval request 2; no payment has been made."
+      }
+    },
+    {
+      "ticket_id": 103,
+      "run_id": "run-103-89d1caaa",
+      "started_at": "2026-10-14T21:24:51+00:00",
+      "result": {
+        "cost_usd": 0.004615175,
+        "duration_ms": 58258,
+        "summary": "Only 8 of 20 requested CC-HOOD-NAVY size M hoodies are in stock; the remaining 12 are blocked because Bulldog Print Co will not ship while overdue invoice 501 ($840) is unpaid. Approval requests 4 (invoice payment), 3 (20 hoodies at $49 each), and 5 (12-unit draft PO for $264) are pending. The proposed price gives a 55.1% gross margin, and the 5-day restock would arrive 2026-09-05 if approved and unblocked; customer reply draft 2 has not been sent."
+      }
+    },
+    {
+      "ticket_id": 103,
+      "run_id": "run-103-07345485",
+      "started_at": "2026-10-14T21:29:31+00:00",
+      "result": {
+        "cost_usd": 0.00178919,
+        "duration_ms": 22381,
+        "summary": "We cannot fulfill the requested 20 hoodies: only 8 CC-HOOD-NAVY size M are on hand, and restocking the 12-unit shortfall costs $264. Cash is $160, so the PO would leave cash below the $250 reserve; the approved PO was not created. The proposed $49 price is approved and yields a 55.1% gross margin, above the 40% minimum; customer draft 2 explains the limitation and remains unsent."
+      }
+    }
+  ],
+  "ledger": [
     {
       "approval_id": 1,
       "ticket_id": 101,
       "kind": "payment",
       "summary": "Approve $840 payment of overdue Bulldog Print Co invoice 501 to unblock shipping.",
-      "requested_by": "accounting",
       "amount": 840.0,
+      "requested_by": "accounting",
       "executed": true,
-      "payment_id": 2,
-      "paid_at": "2026-08-31",
+      "payment_id": 1,
       "approved_by": "Kyle Yeh",
-      "balance_before": 1000.0,
-      "balance_after": 160.0,
-      "ticket_closed": true
+      "decided_at": "2026-10-14 21:28:02",
+      "balance_before": 3400.0,
+      "balance_after": 2560.0
     },
     {
-      "approval_id": 4,
-      "ticket_id": 103,
+      "approval_id": 2,
+      "ticket_id": 102,
       "kind": "payment",
-      "summary": "Approve $840 payment of overdue Bulldog Print Co invoice 501 to unblock shipping.",
-      "requested_by": "accounting",
-      "amount": 840.0,
-      "executed": false,
-      "payment_id": null,
-      "paid_at": null,
-      "approved_by": null,
-      "balance_before": 160.0,
-      "balance_after": 160.0,
-      "ticket_closed": false
+      "summary": "Approve $2,400 rent payment to Elm City Properties for Chapel Street shop, due 2026-09-02.",
+      "amount": 2400.0,
+      "requested_by": "facilities",
+      "executed": true,
+      "payment_id": 2,
+      "approved_by": "Kyle Yeh",
+      "decided_at": "2026-10-14 21:28:07",
+      "balance_before": 2560.0,
+      "balance_after": 160.0
     },
     {
       "approval_id": 3,
       "ticket_id": 103,
       "kind": "discount",
-      "summary": "Approve $40.00 per hoodie for Yale AI Club's 20-unit CC-HOOD-NAVY/M order.",
+      "summary": "Approve 20 CC-HOOD-NAVY size M hoodies at $49 each.",
+      "amount": 980.0,
       "requested_by": "accounting",
-      "amount": 800.0,
-      "executed": true,
+      "executed": false,
       "payment_id": null,
-      "paid_at": null,
-      "approved_by": null,
+      "approved_by": "Kyle Yeh",
+      "decided_at": "2026-10-14 21:28:33",
       "balance_before": 160.0,
-      "balance_after": 160.0,
-      "ticket_closed": true
-    }
-  ],
-  "runs": [
-    {
-      "ticket_id": 101,
-      "run_id": "run-101-4995681a",
-      "result": {
-        "run_id": "run-101-4995681a",
-        "ticket_id": 101,
-        "outcome": {
-          "ticket_id": 101,
-          "status": "waiting_approval",
-          "assignee": "accounting",
-          "resolution": "Size S is out of stock (shortfall 1). Bulldog Print Co will not ship while invoice 501 remains open, and accounting has raised pending approval 1 for its $840 payment; no payment or restock has been made. The customer reply is drafted; if the invoice is paid, a one-unit restock would cost $8 and arrive no earlier than 2026-09-05.",
-          "delegated_to": [
-            "inventory",
-            "customer_service",
-            "accounting"
-          ],
-          "facts_used": [
-            "Shop date: 2026-08-31",
-            "CC-TEE-WHITE size S on hand: 0; requested: 1; shortfall: 1",
-            "Invoice 501: $840, due 2026-08-28, open and 3 days overdue",
-            "Bulldog Print Co lead time: 5 days; earliest potential arrival: 2026-09-05",
-            "One-unit restock cost: $8",
-            "Checking balance: $3,400; balance after invoice payment: $2,560; after all listed obligations: $160",
-            "Pending payment approval: approval 1 for $840",
-            "Customer reply draft: draft 1"
-          ],
-          "policy_cited": [
-            "Every payment requires human approval; no payment was made.",
-            "A vendor will not ship while it has an open unpaid invoice.",
-            "Already-issued obligations may be paid down to zero, never below; negative balances are forbidden.",
-            "Customer messages are drafts only; nothing is ever sent."
-          ],
-          "approval_ids": [
-            1
-          ],
-          "draft_ids": [
-            1
-          ],
-          "money_moved": 0.0,
-          "next_step": "Human approver: decide whether to approve payment approval 1 for $840 to pay invoice 501. No shipment is promised; after payment, the shop can consider a $8 purchase order, which would require separate human approval."
-        },
-        "steps_logged": 61,
-        "delegations": 3,
-        "tool_calls": 19,
-        "input_tokens": 45509,
-        "output_tokens": 2159,
-        "cost_usd": 0.003039425,
-        "duration_s": 41.64,
-        "error": null
-      }
+      "balance_after": 160.0
     },
     {
-      "ticket_id": 102,
-      "run_id": "run-102-9752210f",
-      "result": {
-        "run_id": "run-102-9752210f",
-        "ticket_id": 102,
-        "outcome": {
-          "ticket_id": 102,
-          "status": "waiting_approval",
-          "assignee": "facilities",
-          "resolution": "The $2,400 Chapel Street rent for lease 1 is due 2026-09-02 and remains unpaid. Facilities raised approval request 2; no payment has been made while approval is pending.",
-          "delegated_to": [
-            "facilities"
-          ],
-          "facts_used": [
-            "shop_date=2026-08-31",
-            "lease_id=1",
-            "monthly_rent=$2,400",
-            "due_date=2026-09-02",
-            "checking_balance=$3,400",
-            "approval_id=2 pending"
-          ],
-          "policy_cited": [
-            "A human must approve every payment; pending approval means do not pay.",
-            "Rent is an existing obligation and may be paid down to zero, never below."
-          ],
-          "approval_ids": [
-            2
-          ],
-          "draft_ids": [],
-          "money_moved": 0.0,
-          "next_step": "Human: approve the $2,400 rent payment to Elm City Properties for lease 1 (approval request 2); after approval, facilities can pay it."
-        },
-        "steps_logged": 29,
-        "delegations": 1,
-        "tool_calls": 9,
-        "input_tokens": 21096,
-        "output_tokens": 885,
-        "cost_usd": 0.00093961,
-        "duration_s": 26.25,
-        "error": null
-      }
-    },
-    {
+      "approval_id": 4,
       "ticket_id": 103,
-      "run_id": "run-103-e4ddf700",
-      "result": {
-        "run_id": "run-103-e4ddf700",
-        "ticket_id": 103,
-        "outcome": null,
-        "steps_logged": 101,
-        "delegations": 5,
-        "tool_calls": 32,
-        "input_tokens": 92406,
-        "output_tokens": 4109,
-        "cost_usd": 0.004582445,
-        "duration_s": 83.86,
-        "error": "PermissionError: [WinError 5] Access is denied: 'C:\\\\Users\\\\key8\\\\Desktop\\\\AI Vibecode stuff\\\\Homework 5 for AI class\\\\output\\\\audit_trail.tmp' -> 'C:\\\\Users\\\\key8\\\\Desktop\\\\AI Vibecode stuff\\\\Homework 5 for AI class\\\\output\\\\audit_trail.json'"
-      }
+      "kind": "payment",
+      "summary": "Approve $840 payment of overdue Bulldog Print Co invoice 501.",
+      "amount": 840.0,
+      "requested_by": "accounting",
+      "executed": false,
+      "payment_id": null,
+      "approved_by": "Kyle Yeh",
+      "decided_at": "2026-10-14 21:28:34",
+      "balance_before": 160.0,
+      "balance_after": 160.0
+    },
+    {
+      "approval_id": 5,
+      "ticket_id": 103,
+      "kind": "purchase_order",
+      "summary": "Approve draft purchase order for 12 CC-HOOD-NAVY size M units costing $264.",
+      "amount": 264.0,
+      "requested_by": "accounting",
+      "executed": false,
+      "payment_id": null,
+      "approved_by": "Kyle Yeh",
+      "decided_at": "2026-10-14 21:28:35",
+      "balance_before": 160.0,
+      "balance_after": 160.0
     }
-  ],
-  "final_board": {
-    "shop_date": "2026-08-31",
-    "count": 3,
-    "open": 0,
-    "resolved": 3,
-    "tickets": [
-      {
-        "id": 101,
-        "type": "customer_order",
-        "requester": "Tauhid Zaman",
-        "subject": "Bulldog tee",
-        "sku": "CC-TEE-WHITE",
-        "size": "S",
-        "qty": 1,
-        "lease_id": null,
-        "invoice_id": 501,
-        "status": "resolved",
-        "notes": "Needs a tee in size S.",
-        "assignee": "accounting",
-        "resolution": "Size S is out of stock (shortfall 1). Bulldog Print Co will not ship while invoice 501 remains open; accounting has raised a pending $840 payment approval, so no restock or shipment is promised. Customer reply draft 1 is prepared; if the invoice is paid, a restock would cost $8 and arrive no sooner than 2026-09-05. SETTLED: Kyle Yeh approved payment of $840.00 for invoice 501 on 2026-08-31; checking balance is now $160.00.",
-        "resolved_at": "2026-08-31",
-        "is_open": false,
-        "is_resolved": true,
-        "pending_approvals": []
-      },
-      {
-        "id": 102,
-        "type": "rent_notice",
-        "requester": "Elm City Properties",
-        "subject": "Rent due",
-        "sku": null,
-        "size": null,
-        "qty": null,
-        "lease_id": 1,
-        "invoice_id": null,
-        "status": "resolved",
-        "notes": "Email: shop rent due in 2 days.",
-        "assignee": "facilities",
-        "resolution": "The $2,400 Chapel Street rent for lease 1 is due 2026-09-02 and remains unpaid. Facilities has raised approval request 2; no payment has been made pending human approval. SETTLED: Kyle Yeh approved payment of $2,400.00 for rent on lease 1 on 2026-08-31; checking balance is now $1,000.00.",
-        "resolved_at": "2026-08-31",
-        "is_open": false,
-        "is_resolved": true,
-        "pending_approvals": []
-      },
-      {
-        "id": 103,
-        "type": "price_override",
-        "requester": "Yale AI Club",
-        "subject": "Bulk hoodie discount",
-        "sku": "CC-HOOD-NAVY",
-        "size": "M",
-        "qty": 20,
-        "lease_id": null,
-        "invoice_id": null,
-        "status": "resolved",
-        "notes": "Student org wants 20 hoodies, size M, asking for a bulk discount.",
-        "assignee": "accounting",
-        "resolution": "The $40 per-hoodie discount meets the 40% minimum gross-margin rule (45%), but discount approval 3 is pending. Only 8 of 20 size-M hoodies are in stock; the remaining 12 cannot be restocked until overdue invoice 501 ($840, due 2026-08-28) is paid, and approval 4 is pending. The 12-unit restock would cost $264 and arrive no earlier than 2026-09-05; after existing obligations of $3,240, only $160 remains from the $3,400 balance, so the restock cannot preserve the $250 reserve. Customer reply remains draft 2 only. SETTLED: Kyle Yeh approved the discount. No ledger entry.",
-        "resolved_at": "2026-08-31",
-        "is_open": false,
-        "is_resolved": true,
-        "pending_approvals": []
-      }
-    ]
-  },
-  "final_cash": {
-    "account": "checking",
-    "balance": 160.0,
-    "shop_date": "2026-08-31",
-    "total_owed": 2400.0,
-    "remaining_if_all_paid": -2240.0,
-    "overdue_count": 0,
-    "obligations": [
-      {
-        "kind": "rent",
-        "ref_id": 1,
-        "description": "Rent for Chapel Street shop",
-        "owed_to": "Elm City Properties",
-        "amount": 2400.0,
-        "due_date": "2026-10-02",
-        "days_until_due": 32,
-        "is_overdue": false
-      }
-    ],
-    "payments_made": [
-      {
-        "id": 1,
-        "kind": "rent",
-        "ref_id": 1,
-        "amount": 2400.0,
-        "paid_at": "2026-08-31",
-        "approved_by": "Kyle Yeh"
-      },
-      {
-        "id": 2,
-        "kind": "invoice",
-        "ref_id": 501,
-        "amount": 840.0,
-        "paid_at": "2026-08-31",
-        "approved_by": "Kyle Yeh"
-      }
-    ]
-  }
+  ]
 }
