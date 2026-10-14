@@ -264,12 +264,31 @@ Found by auditing the pushed repository against the assignment pages.
 | Agent narration in `resolved_tickets.json` | Read `content`, not `said` | `contributions()` in `scripts/build_outputs.py` looked for a `said` key that audit rows never had — the agent's words are written under `content` on `delegation_result` and `run_end`. All nine contributions had serialised as `"said": null` while the text sat in the trail the whole time. Regenerating changed exactly nine lines and left the arithmetic check at `matches: true`. |
 | A customer draft is a closing condition | Hardened `backend/prompts/boss.md` | Ticket 101 diagnosed exactly why the shop could not help a named customer and then drafted nothing. The instruction existed but was conditional ("when a person is waiting"), which the boss read as discretionary against a prompt that elsewhere pushes delegation counts down. It is now owed to any ticket with a `requester`, checked before close, and explicitly worth going past the usual delegation count for. |
 
-**Why the prompt fix is not yet visible in the run.** The committed run
-predates it. Making it show would mean resetting and re-running all three
-tickets, which would also invalidate the board screenshots in
-`output/resolved_board.html` and the parts of the Reflection tab that cite 101
-having no draft. The gap is documented rather than overwritten — see the
-Reflection tab, which already names it as the run's clearest failure.
+**The board was reset and re-run to prove the prompt fix.** Ticket 101 now
+delegates to customer service and writes draft #1 to Tauhid Zaman. Everything
+downstream was rebuilt from that run: `resolved_tickets.json`, the Actual
+sections, the Cash tab, the Reflection, and three fresh board screenshots. The
+ledger still reconciles to $160.00.
+
+| Follow-on decision | Choice | Why |
+|---|---|---|
+| Prompt edits need a server restart | Restart before any run that is meant to test a prompt | `backend/prompts.load()` is `lru_cache`'d and `build_team()` runs once at startup, so a server started before an edit keeps the old prompt in memory. The first re-run was driven by a two-hour-old process and was discarded for exactly this reason. |
+| Figures in the write-up are derived, not typed | `run_shape()` in `fill_reflection.py`; discount read from the approval payload in `fill_desk_tickets.py` | The re-run changed the discount from $36.67/unit to $40.00/unit and the tool-call counts with it. Anything hardcoded silently went stale. Counts now come from `audit_trail.json` and prices from the approval that was actually granted. |
+| Plan-vs-run verdicts stay hand-written | `SCORECARD` in `fill_desk_tickets.py` | Whether a prediction "held" is a judgement about meaning, not a string comparison. It is re-scored by hand each run, which is why 101 flipped from *wrong* to *right* on the customer draft and 103 flipped the other way on the purchase order. |
+
+**What the re-run cost elsewhere.** Two things improved unprompted: every ticket
+closed in a single pass, and customer service started delegating to other
+specialists directly rather than always reporting to the boss. One thing got
+weaker: ticket 103 never called `create_purchase_order` at all, where the
+earlier run put it to the tool and had it refused. Same conclusion, less
+evidence. Recorded rather than smoothed over.
+
+**One caveat on the approvals.** The earlier pass's approvals were clicked by
+hand in the dashboard. This pass's were executed by `scripts/full_run.py`
+against the same human approve route, in payment-priority order, with
+`decided_by` set to the shop owner. No agent can reach that route either way, so
+the boundary holds — but these `decided_by` values came from the script rather
+than a click.
 
 ## Standing working rules
 

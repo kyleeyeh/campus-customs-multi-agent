@@ -276,26 +276,26 @@
 
   <div class="card">
     <h3>What happened</h3>
-    <p class="note">Run <code>run-101-35c3f037</code> ·
+    <p class="note">Run <code>run-101-4995681a</code> ·
     final status <strong>resolved</strong> ·
     owned by <strong>Patrick Brewer</strong></p>
-    <p>The requested CC-TEE-WHITE size S cannot be supplied now: stock is 0, leaving a shortfall of 1. Payment approval 1 is pending for the overdue $840 invoice 501; Bulldog Print Co will not ship until it is paid, and after unblocking a one-unit restock would cost $8 and arrive in about 5 days (earliest 2026-09-05). SETTLED: Kyle Yeh approved payment of $840.00 for invoice 501 on 2026-08-31; checking balance is now $160.00.</p>
+    <p>Size S is out of stock (shortfall 1). Bulldog Print Co will not ship while invoice 501 remains open; accounting has raised a pending $840 payment approval, so no restock or shipment is promised. Customer reply draft 1 is prepared; if the invoice is paid, a restock would cost $8 and arrive no sooner than 2026-09-05. SETTLED: Kyle Yeh approved payment of $840.00 for invoice 501 on 2026-08-31; checking balance is now $160.00.</p>
   </div>
 
   <h3>Delegation chain actually taken</h3>
   <p class="note" style="font-family:var(--mono);font-size:13px">
-    boss &rarr; inventory &rarr; accounting
+    boss &rarr; inventory &rarr; customer_service &rarr; accounting
   </p>
-  <p class="note">2 delegation(s); 3 of the five agents appeared.</p>
+  <p class="note">3 delegation(s); 4 of the five agents appeared.</p>
 
   <h3>Tools actually called</h3>
-  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">list_open_tickets</span> <span class="t">get_ticket</span> <span class="t">update_ticket</span></td></tr><tr><td><strong>David Rose</strong><br><span class='note' style='font-size:11px'>inventory</span></td><td><span class="t">check_stock</span> <span class="t">find_restock_vendor</span></td></tr><tr><td><strong>Patrick Brewer</strong><br><span class='note' style='font-size:11px'>accounting</span></td><td><span class="t">get_cash_position</span> <span class="t">list_approvals</span> <span class="t">get_shop_policy</span> <span class="t">request_approval</span></td></tr></table>
+  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">get_ticket</span> <span class="t">get_shop_policy</span> <span class="t">update_ticket</span></td></tr><tr><td><strong>Alexis Rose</strong><br><span class='note' style='font-size:11px'>customer service</span></td><td><span class="t">get_ticket</span> <span class="t">save_draft_message</span></td></tr><tr><td><strong>David Rose</strong><br><span class='note' style='font-size:11px'>inventory</span></td><td><span class="t">get_ticket</span> <span class="t">find_restock_vendor</span></td></tr><tr><td><strong>Patrick Brewer</strong><br><span class='note' style='font-size:11px'>accounting</span></td><td><span class="t">get_cash_position</span> <span class="t">get_shop_policy</span> <span class="t">list_approvals</span> <span class="t">request_approval</span></td></tr></table>
 
   <h3>Human approvals</h3>
   <table><tr><th>#</th><th>Kind</th><th>Amount</th><th>Decision</th></tr><tr><td class='num'>#1</td><td>payment</td><td class='num'>$840.00</td><td>approved by Kyle Yeh</td></tr></table>
 
   <h3>Money and drafts</h3>
-  <ul class="tight"><li><span class='t'>payment #2</span> invoice <strong>$840.00</strong> on 2026-08-31, approved by Kyle Yeh</li><li class='note'>No draft was written on this run.</li></ul>
+  <ul class="tight"><li><span class='t'>payment #2</span> invoice <strong>$840.00</strong> on 2026-08-31, approved by Kyle Yeh</li><li>draft #1 to Tauhid Zaman (customer) — <strong>not sent</strong></li></ul>
   <table>
     <tr><th>Balance before</th><th>Change</th><th>Balance after</th></tr>
     <tr><td class="num">$1,000.00</td>
@@ -305,7 +305,7 @@
 
   <h3>Plan versus run</h3>
   <table><tr><th>What the plan said</th><th></th><th>What happened</th></tr>
-    <tr><td>Boss calls inventory first</td><td><span class='t'>right</span></td><td>It did — stock was the branch-decider, as argued.</td></tr><tr><td>Facilities not involved</td><td><span class='t'>right</span></td><td>Never called. Rent appeared only inside get_cash_position.</td></tr><tr><td>Three delegations</td><td><span class='t x'>wrong</span></td><td>Two. The boss ran both hops itself.</td></tr><tr><td>Inventory delegates straight to accounting</td><td><span class='t x'>wrong</span></td><td>Flagged as the least certain call, and it was wrong: inventory reported back and the boss routed to accounting.</td></tr><tr><td>Customer service drafts a reply</td><td><span class='t x'>wrong</span></td><td>Never called. No draft was written for Tauhid — the real gap in this run.</td></tr><tr><td>Shortfall of 1, blocked by invoice 501 ($840)</td><td><span class='t'>right</span></td><td>Exactly that.</td></tr><tr><td>No purchase order raised</td><td><span class='t'>right</span></td><td>None attempted, as expected while the vendor was blocked.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Approval parked; nothing paid until a human decided.</td></tr>
+    <tr><td>Boss calls inventory first</td><td><span class='t'>right</span></td><td>It did — stock was the branch-decider, as argued.</td></tr><tr><td>Facilities not involved</td><td><span class='t'>right</span></td><td>Never called. Rent appeared only inside get_cash_position.</td></tr><tr><td>Three delegations</td><td><span class='t'>right</span></td><td>Three: inventory, customer_service, accounting — all fanned out from the boss.</td></tr><tr><td>Inventory delegates straight to accounting</td><td><span class='t x'>wrong</span></td><td>Flagged as the least certain call, and it was wrong again: inventory reported back and the boss routed to accounting itself.</td></tr><tr><td>Customer service drafts a reply</td><td><span class='t'>right</span></td><td>Draft #1 to Tauhid Zaman — says size S is unavailable, promises no shipment, and commits only to following up.</td></tr><tr><td>Shortfall of 1, blocked by invoice 501 ($840)</td><td><span class='t'>right</span></td><td>Exactly that.</td></tr><tr><td>No purchase order raised</td><td><span class='t'>right</span></td><td>None attempted, as expected while the vendor was blocked.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Approval parked; nothing paid until a human decided.</td></tr>
   </table>
 
 </section>
@@ -412,10 +412,10 @@
 
   <div class="card">
     <h3>What happened</h3>
-    <p class="note">Run <code>run-102-3ef5768e</code> ·
+    <p class="note">Run <code>run-102-9752210f</code> ·
     final status <strong>resolved</strong> ·
     owned by <strong>Stevie Budd</strong></p>
-    <p>The $2,400 rent for the Chapel Street lease is unpaid and due 2026-09-02. Facilities raised approval request 2 for payment; rent may be paid from the $3,400 checking balance, leaving $1,000, but no payment has been made pending human approval. SETTLED: Kyle Yeh approved payment of $2,400.00 for rent on lease 1 on 2026-08-31; checking balance is now $1,000.00.</p>
+    <p>The $2,400 Chapel Street rent for lease 1 is due 2026-09-02 and remains unpaid. Facilities has raised approval request 2; no payment has been made pending human approval. SETTLED: Kyle Yeh approved payment of $2,400.00 for rent on lease 1 on 2026-08-31; checking balance is now $1,000.00.</p>
   </div>
 
   <h3>Delegation chain actually taken</h3>
@@ -425,7 +425,7 @@
   <p class="note">1 delegation(s); 2 of the five agents appeared.</p>
 
   <h3>Tools actually called</h3>
-  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">get_ticket</span> <span class="t">update_ticket</span></td></tr><tr><td><strong>Stevie Budd</strong><br><span class='note' style='font-size:11px'>facilities</span></td><td><span class="t">get_lease</span> <span class="t">get_cash_position</span> <span class="t">get_ticket</span> <span class="t">request_approval</span></td></tr></table>
+  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">get_ticket</span> <span class="t">update_ticket</span></td></tr><tr><td><strong>Stevie Budd</strong><br><span class='note' style='font-size:11px'>facilities</span></td><td><span class="t">get_lease</span> <span class="t">get_cash_position</span> <span class="t">list_approvals</span> <span class="t">request_approval</span></td></tr></table>
 
   <h3>Human approvals</h3>
   <table><tr><th>#</th><th>Kind</th><th>Amount</th><th>Decision</th></tr><tr><td class='num'>#2</td><td>payment</td><td class='num'>$2,400.00</td><td>approved by Kyle Yeh</td></tr></table>
@@ -441,7 +441,7 @@
 
   <h3>Plan versus run</h3>
   <table><tr><th>What the plan said</th><th></th><th>What happened</th></tr>
-    <tr><td>Boss calls facilities first</td><td><span class='t'>right</span></td><td>Straight there — only lease_id was populated.</td></tr><tr><td>Exactly one delegation</td><td><span class='t'>right</span></td><td>One. boss → facilities and back.</td></tr><tr><td>Accounting deliberately excluded</td><td><span class='t'>right</span></td><td>Not called. Facilities read the balance itself.</td></tr><tr><td>Customer service not involved</td><td><span class='t'>right</span></td><td>Not called; the answer to a rent notice is a payment.</td></tr><tr><td>Tools: get_lease, get_cash_position, request_approval</td><td><span class='t'>right</span></td><td>All three, plus get_ticket.</td></tr><tr><td>Rent $2,400 due 2026-09-02, no invoice row</td><td><span class='t'>right</span></td><td>Confirmed from the lease.</td></tr><tr><td>Cheapest ticket on the board</td><td><span class='t'>right</span></td><td>Fewest hops of the three.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Approval #2 parked and nothing else.</td></tr>
+    <tr><td>Boss calls facilities first</td><td><span class='t'>right</span></td><td>Straight there — only lease_id was populated.</td></tr><tr><td>Exactly one delegation</td><td><span class='t'>right</span></td><td>One. boss → facilities and back.</td></tr><tr><td>Accounting deliberately excluded</td><td><span class='t'>right</span></td><td>Not called. Facilities read the balance itself.</td></tr><tr><td>Customer service not involved</td><td><span class='t'>right</span></td><td>Not called; the answer to a rent notice is a payment.</td></tr><tr><td>Tools: get_lease, get_cash_position, request_approval</td><td><span class='t'>right</span></td><td>All three, plus list_approvals.</td></tr><tr><td>Rent $2,400 due 2026-09-02, no invoice row</td><td><span class='t'>right</span></td><td>Confirmed from the lease.</td></tr><tr><td>Cheapest ticket on the board</td><td><span class='t'>right</span></td><td>Two agents, six tool calls — fewest of the three.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Approval #2 parked and nothing else.</td></tr>
   </table>
 
 </section>
@@ -574,26 +574,26 @@
 
   <div class="card">
     <h3>What happened</h3>
-    <p class="note">Run <code>run-103-5d789ce4</code> ·
+    <p class="note">Run <code>run-103-e4ddf700</code> ·
     final status <strong>resolved</strong> ·
     owned by <strong>Patrick Brewer</strong></p>
-    <p>The approved $36.67 unit price meets the 40% gross-margin floor, but the shop cannot fulfill all 20: 8 are in stock and the remaining 12 would cost $264 to restock. With $160 cash, the purchase order would overdraw the account by $104 and cannot be placed; invoice 501 has been paid, and the 12-unit restock could arrive 2026-09-05 only if funding is addressed and a purchase order is approved. Draft customer reply 1 is ready; nothing has been sent.</p>
+    <p>The $40 per-hoodie discount meets the 40% minimum gross-margin rule (45%), but discount approval 3 is pending. Only 8 of 20 size-M hoodies are in stock; the remaining 12 cannot be restocked until overdue invoice 501 ($840, due 2026-08-28) is paid, and approval 4 is pending. The 12-unit restock would cost $264 and arrive no earlier than 2026-09-05; after existing obligations of $3,240, only $160 remains from the $3,400 balance, so the restock cannot preserve the $250 reserve. Customer reply remains draft 2 only. SETTLED: Kyle Yeh approved the discount. No ledger entry.</p>
   </div>
 
   <h3>Delegation chain actually taken</h3>
   <p class="note" style="font-family:var(--mono);font-size:13px">
-    boss &rarr; accounting &rarr; inventory &rarr; accounting &rarr; inventory &rarr; accounting &rarr; customer_service &rarr; accounting
+    boss &rarr; inventory &rarr; customer_service &rarr; accounting &rarr; inventory &rarr; accounting
   </p>
-  <p class="note">7 delegation(s); 4 of the five agents appeared.</p>
+  <p class="note">5 delegation(s); 4 of the five agents appeared.</p>
 
   <h3>Tools actually called</h3>
-  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">get_ticket</span> <span class="t">update_ticket</span> <span class="t">get_shop_policy</span></td></tr><tr><td><strong>Patrick Brewer</strong><br><span class='note' style='font-size:11px'>accounting</span></td><td><span class="t">get_ticket</span> <span class="t">get_shop_policy</span> <span class="t">get_cash_position</span> <span class="t">evaluate_discount</span> <span class="t">request_approval</span> <span class="t">list_approvals</span> <span class="t">create_purchase_order</span></td></tr><tr><td><strong>David Rose</strong><br><span class='note' style='font-size:11px'>inventory</span></td><td><span class="t">find_restock_vendor</span> <span class="t">get_ticket</span> <span class="t">check_stock</span></td></tr><tr><td><strong>Alexis Rose</strong><br><span class='note' style='font-size:11px'>customer service</span></td><td><span class="t">get_ticket</span> <span class="t">save_draft_message</span></td></tr></table>
+  <table><tr><th>Agent</th><th>Tools</th></tr><tr><td><strong>Johnny Rose</strong><br><span class='note' style='font-size:11px'>boss</span></td><td><span class="t">list_open_tickets</span> <span class="t">get_ticket</span> <span class="t">get_shop_policy</span></td></tr><tr><td><strong>Alexis Rose</strong><br><span class='note' style='font-size:11px'>customer service</span></td><td><span class="t">get_ticket</span> <span class="t">get_shop_policy</span> <span class="t">save_draft_message</span></td></tr><tr><td><strong>Patrick Brewer</strong><br><span class='note' style='font-size:11px'>accounting</span></td><td><span class="t">get_ticket</span> <span class="t">get_cash_position</span> <span class="t">list_approvals</span> <span class="t">get_shop_policy</span> <span class="t">evaluate_discount</span> <span class="t">request_approval</span></td></tr><tr><td><strong>David Rose</strong><br><span class='note' style='font-size:11px'>inventory</span></td><td><span class="t">find_restock_vendor</span> <span class="t">get_ticket</span> <span class="t">check_stock</span></td></tr></table>
 
   <h3>Human approvals</h3>
-  <table><tr><th>#</th><th>Kind</th><th>Amount</th><th>Decision</th></tr><tr><td class='num'>#3</td><td>discount</td><td class='num'>$733.40</td><td>approved by Kyle Yeh</td></tr><tr><td class='num'>#4</td><td>payment</td><td class='num'>$840.00</td><td>approved by Kyle Yeh</td></tr></table>
+  <table><tr><th>#</th><th>Kind</th><th>Amount</th><th>Decision</th></tr><tr><td class='num'>#3</td><td>discount</td><td class='num'>$800.00</td><td>approved by Kyle Yeh</td></tr><tr><td class='num'>#4</td><td>payment</td><td class='num'>$840.00</td><td>approved by Kyle Yeh</td></tr></table>
 
   <h3>Money and drafts</h3>
-  <ul class="tight"><li>No cash moved on this ticket.</li><li>draft #1 to Yale AI Club (customer) — <strong>not sent</strong></li></ul>
+  <ul class="tight"><li>No cash moved on this ticket.</li><li>draft #2 to Yale AI Club (customer) — <strong>not sent</strong></li></ul>
   <table>
     <tr><th>Balance before</th><th>Change</th><th>Balance after</th></tr>
     <tr><td class="num">$160.00</td>
@@ -603,7 +603,7 @@
 
   <h3>Plan versus run</h3>
   <table><tr><th>What the plan said</th><th></th><th>What happened</th></tr>
-    <tr><td>Boss calls inventory first</td><td><span class='t w'>partly</span></td><td>Both, across two runs. The first run went to ACCOUNTING first — which the plan named as its least confident call. The closing run went to inventory first, as predicted.</td></tr><tr><td>Three delegations</td><td><span class='t w'>partly</span></td><td>Three on the first run, four on the closing run.</td></tr><tr><td>Facilities not involved</td><td><span class='t'>right</span></td><td>Correctly left out of both runs.</td></tr><tr><td>Discount floor of $36.67/unit</td><td><span class='t'>right</span></td><td>evaluate_discount returned exactly $36.67.</td></tr><tr><td>Shortfall of 12, restock $264</td><td><span class='t'>right</span></td><td>8 of 20 on hand; $264 to close the gap.</td></tr><tr><td>A purchase order is attempted and refused</td><td><span class='t'>right</span></td><td>The closing run called create_purchase_order and it was refused — $264 against $160. purchase_orders is empty, so nothing was committed.</td></tr><tr><td>Customer service drafts a reply</td><td><span class='t'>right</span></td><td>Draft #1 to the Yale AI Club, offering the 8 in stock. Written on the closing run, not the first.</td></tr><tr><td>A duplicate $840 approval may be raised</td><td><span class='t'>right</span></td><td>It was — approval #4. A human approved it and pay_invoice still refused, because invoice 501 had already been settled by approval #1.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Nothing moved on this ticket at all.</td></tr>
+    <tr><td>Boss calls inventory first</td><td><span class='t'>right</span></td><td>Right this time. The plan named this its least confident call; the run opened boss → inventory exactly as predicted.</td></tr><tr><td>Three delegations</td><td><span class='t x'>wrong</span></td><td>Five — and two of them were specialist-to-specialist: customer_service → accounting and customer_service → inventory, without passing back through the boss.</td></tr><tr><td>Facilities not involved</td><td><span class='t'>right</span></td><td>Correctly left out.</td></tr><tr><td>Discount floor of $36.67/unit</td><td><span class='t w'>partly</span></td><td>The floor was computed exactly — evaluate_discount returned $36.67 as the lowest price meeting the 40% margin. But the shop approved the customer's own $40.00 offer (45% margin, $800 for 20) rather than countering down to the floor.</td></tr><tr><td>Shortfall of 12, restock $264</td><td><span class='t'>right</span></td><td>8 of 20 on hand; find_restock_vendor priced the 12-unit gap at $264.</td></tr><tr><td>A purchase order is attempted and refused</td><td><span class='t x'>wrong</span></td><td>No purchase order was attempted at all this time. Accounting reasoned ahead of the tool — it ruled the $264 restock unfundable against the $250 reserve and never called create_purchase_order. purchase_orders is empty either way.</td></tr><tr><td>Customer service drafts a reply</td><td><span class='t'>right</span></td><td>Draft #2 to the Yale AI Club: 8 of 20 available, the rest not fillable now.</td></tr><tr><td>A duplicate $840 approval may be raised</td><td><span class='t'>right</span></td><td>It was — approval #4, again. A human approved it and pay_invoice still refused, because invoice 501 had already been settled by approval #1.</td></tr><tr><td>Agents move $0.00</td><td><span class='t'>right</span></td><td>Nothing moved on this ticket at all.</td></tr>
   </table>
 
 </section>
@@ -654,10 +654,10 @@
 
   <h3>Two things that did not move cash, and why</h3>
   <ul class="tight">
-    <li>Approval <strong>#3</strong> on ticket 103 approved a bulk discount at
-      <strong>$36.67</strong>/unit ($733.40 for 20 units). A discount is a price, not a
-      payment — nothing is debited, and counting its headline figure as spending would overstate
-      outgoings by $733.40.</li>
+    <li>Approval <strong>#3</strong> on ticket 103 approved a bulk discount
+      at <strong>$40.00</strong>/unit ($800.00 for 20 units).
+      A discount is a price, not a payment — nothing is debited, and counting its headline figure
+      as spending would overstate outgoings by $800.00.</li>
     <li>Approval <strong>#4</strong> on ticket 103 ($840.00) was approved by a human and then <strong>refused by the pay tool</strong> — invoice 501 had already been settled by approval #1. No second payment was made, which is exactly why it does not appear in the ledger above.</li>
     <li>No purchase order was ever placed, so no restock was committed. The 12-unit hoodie
       restock at $264.00 could not be funded from the $160.00 remaining, and the
@@ -673,44 +673,54 @@
   <h2>Reflection</h2>
 
   <p class="note">Written after comparing the plan on the ticket tabs against the run that
-  actually happened, and against the itemised ledger on the Cash tab.</p>
+  actually happened, and against the itemised ledger on the Cash tab. Every count below is
+  read off <code>audit_trail.json</code> for this pass, not typed in.</p>
 
   <h3>How the agents performed on each ticket</h3>
 
   <div class="card first">
-    <h3>Ticket 102 — the best work on the board</h3>
-    <p>Two agents, <strong>one delegation</strong>, six tool calls. Stevie read the lease,
-    checked cash, parked the approval and stopped. It avoided the structural trap in this
-    ticket: rent is the one obligation in the shop with <strong>no row in
-    <code>invoices</code></strong>, so an agent that goes looking for one reports "nothing
-    owed" and is exactly backwards. It also did not treat the $250 reserve as a reason to
-    refuse rent — correct, since the reserve binds discretionary spend, not an obligation
-    already incurred. Nothing wasted, nothing missed.</p>
+    <h3>Ticket 102 &mdash; the tightest work on the board</h3>
+    <p>2 agents, <strong>one delegation</strong>, 6 tool calls,
+    and the cheapest run of the three. Stevie read the lease, checked cash, parked the
+    approval and stopped. It avoided the structural trap in this ticket: rent is the one
+    obligation in the shop with <strong>no row in <code>invoices</code></strong>, so an agent
+    that goes looking for one reports "nothing owed" and is exactly backwards. It also did not
+    treat the $250 reserve as a reason to refuse rent &mdash; correct, since the reserve binds
+    discretionary spend, not an obligation already incurred. Nothing wasted, nothing missed.</p>
   </div>
 
   <div class="card">
-    <h3>Ticket 101 — excellent diagnosis, incomplete service</h3>
-    <p>Ten tool calls. David avoided the size trap — <code>CC-TEE-WHITE</code> reads ten
-    units across M, L and XL while size S sits at zero — and found the real blocker: the
-    only vendor who can reprint apparel will not ship while invoice 501 stands. Patrick
-    costed the unblock at exactly $840.</p>
-    <p>But <strong>Tauhid Zaman was never written to.</strong> Alexis was never called and
-    no draft exists for this ticket. The shop worked out precisely why it could not help a
-    customer and then told him nothing. The analysis deserves a high mark; the outcome is a
-    partial failure, because a resolved ticket and a served customer are not the same thing.</p>
+    <h3>Ticket 101 &mdash; diagnosis and service, this time</h3>
+    <p>4 agents, 3 delegations, 11 tool calls.
+    David found the real blocker: the only vendor who can reprint apparel will not ship while
+    invoice 501 stands, so the one-unit shortfall cannot be closed for $8 until $840 moves.
+    Patrick costed the unblock at exactly that and parked it. Worth noting he reached the
+    shortfall through the ticket payload rather than calling
+    <span class="t">check_stock</span> &mdash; the number was right, but the cheaper read was
+    also the less deliberate one.</p>
+    <p><strong>Alexis wrote to Tauhid Zaman.</strong> Draft #1 says size S is unavailable,
+    promises no shipment, and commits only to following up &mdash; which is the correct message
+    when the honest answer is "not yet". This is the difference between a ticket that is closed
+    and a customer who has been served, and on the previous pass the shop managed only the
+    first.</p>
   </div>
 
   <div class="card not">
-    <h3>Ticket 103 — the most work and the weakest judgement</h3>
-    <p>Twenty-eight tool calls across two runs, roughly 4.7&times; ticket 102.</p>
-    <p>What it got right: <strong>$36.67</strong> per unit is exactly the margin floor
-    ($22 cost &divide; 0.6), the 12-unit shortfall and $264 restock are right, and the
-    purchase order was correctly refused against $160 available.</p>
-    <p>What it got wrong is specific. <strong>Patrick raised approval #4 to pay invoice
-    501 — a bill ticket 101 already had pending.</strong> That spent one of the approver's
-    decisions on a duplicate. The pay tool refused it, but the agent should not have asked.
-    It also approved a discount on twenty hoodies the shop can supply eight of and cannot
-    fund the remainder of: a price for goods that will never ship.</p>
+    <h3>Ticket 103 &mdash; the most work and still the weakest judgement</h3>
+    <p>22 tool calls and 5 delegations, roughly
+    3.7&times; ticket 102 &mdash; but one pass, where the previous run needed two.</p>
+    <p>What it got right: the 12-unit shortfall and the $264 restock are exact, the margin
+    floor was computed correctly at <strong>$36.67</strong> ($22 cost &divide; 0.6), and the
+    customer's own <strong>$40.00</strong> offer was checked against it rather than waved
+    through &mdash; 45% margin, above the 40% floor, $800 for twenty.</p>
+    <p>What it got wrong is specific. <strong>Patrick raised approval #4 to pay invoice 501
+    &mdash; a bill ticket 101 already had pending.</strong> That spent one of the approver's
+    decisions on a duplicate, and it happened again this run. The pay tool refused it, but the
+    agent should not have asked. It also approved a price on twenty hoodies the shop can supply
+    eight of and cannot fund the remainder of. And where the previous run at least put the
+    purchase order to the tool and had it refused, this one never called
+    <span class="t">create_purchase_order</span> at all &mdash; accounting ruled the $264
+    unfundable against the $250 reserve and stopped. Same answer, less evidence.</p>
   </div>
 
   <h3>Actual against the Expected plan</h3>
@@ -718,32 +728,43 @@
   <table>
     <tr><th>Ticket</th><th>Verdict</th></tr>
     <tr><td class="num">102</td><td><strong>Called exactly.</strong> Facilities alone, one
-      delegation, accounting deliberately excluded — because facilities can read
+      delegation, accounting deliberately excluded &mdash; because facilities can read
       <span class="t">get_cash_position</span> itself and cannot pay rent in any case.
-      Every part of that held.</td></tr>
-    <tr><td class="num">101</td><td><strong>Right on structure, wrong on staffing.</strong>
-      Inventory first, facilities correctly excluded, shortfall of 1 and the $840 blocker all
-      as predicted. But the plan expected three delegations and a customer draft; the run
-      produced two and no draft.</td></tr>
-    <tr><td class="num">103</td><td><strong>Split.</strong> The plan predicted inventory
-      first and flagged that, on this page, as the single prediction most likely to be wrong.
-      It was wrong on the first run (accounting first) and right on the closing run. The
-      duplicate $840 approval the plan listed as a <em>risk</em> actually happened.</td></tr>
+      Every part of that held, on both runs.</td></tr>
+    <tr><td class="num">101</td><td><strong>The plan finally came true.</strong> Inventory
+      first, facilities correctly excluded, shortfall of 1 and the $840 blocker as predicted
+      &mdash; and this time the three delegations and the customer draft the plan expected both
+      happened. The one miss is the same as before: the plan had inventory handing off straight
+      to accounting, and instead every hop went back through the boss.</td></tr>
+    <tr><td class="num">103</td><td><strong>Right where it doubted itself, wrong on
+      size.</strong> The plan named "inventory first" as its least confident call and the run
+      opened exactly that way. But three delegations became five, two of which were
+      specialist-to-specialist, and the duplicate $840 approval the plan listed as a
+      <em>risk</em> happened again.</td></tr>
   </table>
 
   <p>The pattern is worth stating plainly: <strong>the plan was reliable about the data and
-  unreliable about the agents.</strong> Every figure predicted from the database — the
-  shortfalls, the $840, the $36.67, the $264 — came out exact. Every prediction about which
-  agent would act when was shakier, and the one held with least confidence is the one that
-  broke.</p>
+  unreliable about the agents.</strong> Every figure predicted from the database &mdash; the
+  shortfalls, the $840, the $36.67, the $264 &mdash; came out exact, across two separate runs.
+  Every prediction about <em>which agent would act when</em> was shakier, and the routing
+  changed between runs even though the database did not.</p>
 
   <h3>What would have been simpler as a single agent with tools</h3>
 
-  <p><strong>Approval #4 is a failure the multi-agent design caused.</strong> Patrick working
-  ticket 103 had no idea that Patrick working ticket 101 had already parked a request against
-  invoice 501. One agent holding one context would not have asked twice. The guardrail caught
-  it — see the Cash tab, where approval #4 is recorded as approved and then refused — but the
-  architecture created the situation the guardrail had to catch.</p>
+  <p><strong>Approval #4 is a failure the multi-agent design caused, and it is
+  reproducible.</strong> Patrick working ticket 103 had no idea that Patrick working ticket 101
+  had already parked a request against invoice 501 &mdash; because they are different runs
+  holding different contexts. One agent carrying one context would not have asked twice. It
+  happened on both passes. The guardrail caught it both times &mdash; see the Cash tab, where
+  approval #4 is recorded as approved and then refused &mdash; but the architecture created the
+  situation the guardrail had to catch.</p>
+
+  <p><strong>Ticket 103 shows the coordination cost directly.</strong> Alexis delegated to
+  Patrick, then to David, then reported to Johnny, who delegated to Patrick again &mdash; five
+  hops to reach a conclusion that rests on three numbers ($40 clears the floor, 12 units short,
+  $264 unaffordable). The trail even contains the architecture arguing with itself: Alexis
+  tried to delegate back to the boss and the framework refused it to avoid a loop. That beat
+  cost a model round-trip and produced nothing.</p>
 
   <p><strong>Ticket 102 did not need a team at all.</strong> <code>boss &rarr; facilities
   &rarr; boss</code> is a full extra model round-trip, re-sending a system prompt and a set of
@@ -751,26 +772,27 @@
   <span class="t">get_cash_position</span> and <span class="t">request_approval</span> could
   have given directly.</p>
 
-  <p>The usual defence of the split is safety — customer service cannot call
+  <p>The usual defence of the split is safety &mdash; customer service cannot call
   <span class="t">pay_invoice</span> because the tool is not on its list. That is weaker than
-  it looks, because <strong>the real guards live in the MCP server, not in the prompts</strong>:
-  no overdraft, no double payment and no payment without an approved approval are enforced in
-  <code>_spend_guard</code> and <code>_check_approval</code>. A single agent holding all
-  seventeen tools would hit exactly the same walls.</p>
+  it looks, because <strong>the real guards live in the MCP server, not in the
+  prompts</strong>: no overdraft, no double payment and no payment without an approved approval
+  are enforced in <code>_spend_guard</code> and <code>_check_approval</code>. A single agent
+  holding all seventeen tools would hit exactly the same walls.</p>
 
   <p>What the split genuinely bought was role-specific prompts that encode role-specific traps
-  — the size trap for inventory, "rent has no invoice row" for facilities — and a dashboard
-  where the work is legible as a conversation. Both are real gains. Neither required five
-  separate model contexts; one longer prompt could carry the same warnings. The design would
-  begin to pay for itself with hundreds of tickets worked in parallel, or with different roles
-  needing different approvers or permissions. On a board of three, it cost more than it
-  returned.</p>
+  &mdash; the size trap for inventory, "rent has no invoice row" for facilities, and the line
+  that now makes a customer draft a closing condition rather than a nicety &mdash; and a
+  dashboard where the work is legible as a conversation. Both are real gains, and the second
+  one is what fixed ticket 101 between runs. Neither required five separate model contexts; one
+  longer prompt could carry the same warnings. The design would begin to pay for itself with
+  hundreds of tickets worked in parallel, or with different roles needing different approvers
+  or permissions. On a board of three, it cost more than it returned.</p>
 
   <h3>Three new problems this team could solve with the tools we built</h3>
 
   <ol class="chain">
-    <li><span class="hop">The Yale AI Club accepts the eight hoodies at $36.67</span>
-      <div class="beat-text">Discount approval #3 is already granted.
+    <li><span class="hop">The Yale AI Club accepts the eight hoodies at $40.00</span>
+      <div class="beat-text">Discount approval #3 is already granted at that price.
       <span class="t">check_stock</span> confirms eight in size M,
       <span class="t">save_draft_message</span> writes the confirmation and
       <span class="t">update_ticket</span> closes it. No new tooling at all.</div></li>
@@ -780,14 +802,14 @@
       specialty, so "mugs and small goods" routes correctly rather than defaulting to the
       apparel printer. Patrick weighs it against the $160 remaining using the written payment
       priority, then <span class="t">request_approval</span> and
-      <span class="t">pay_invoice</span>. If the amount exceeds $160 the tool refuses — which
-      is the correct answer, not a failure.</div></li>
+      <span class="t">pay_invoice</span>. If the amount exceeds $160 the tool refuses &mdash;
+      which is the correct answer, not a failure.</div></li>
 
     <li><span class="hop">A customer wants the tee in size M</span>
       <div class="beat-text">Five in stock at $28 list. This is the happy path the board never
       exercised: <span class="t">check_stock</span> reports it fillable, Alexis drafts the
       confirmation, the boss resolves. Worth noting only because every ticket we ran was a
-      problem — the team has never actually completed an easy one.</div></li>
+      problem &mdash; the team has never actually completed an easy one.</div></li>
   </ol>
 
   <h3>Three it could not solve, and what each would need</h3>
@@ -797,7 +819,7 @@
       <div class="beat-text"><strong>No tool in the server writes
       <code>inventory.qty</code>.</strong> If the twelve hoodies were ordered and landed on
       2026-09-05, nothing could record their arrival. The <code>purchase_orders</code> table
-      even declares a <code>received</code> status that no code path can reach — only
+      even declares a <code>received</code> status that no code path can reach &mdash; only
       <code>ordered</code> is ever set.
       <br><strong>Needs:</strong> a <code>receive_purchase_order</code> tool that increments
       stock and closes the order, and an inventory agent permitted to call it. Without it the
@@ -805,9 +827,9 @@
 
     <li><span class="hop">Any money coming in</span>
       <div class="beat-text"><strong>No tool increases
-      <code>cash_accounts.balance</code></strong> — the Cash tab only ever falls, by design.
-      So the shop has approved a $36.67 price on ticket 103 that it has no mechanism to
-      collect: selling the eight hoodies in stock would be $293.36 the ledger cannot record.
+      <code>cash_accounts.balance</code></strong> &mdash; the Cash tab only ever falls, by
+      design. So the shop has approved a $40.00 price on ticket 103 that it has no mechanism to
+      collect: selling the eight hoodies in stock would be $320.00 the ledger cannot record.
       <br><strong>Needs:</strong> a <code>record_sale</code> tool, a receivables concept so an
       unpaid customer order is distinct from cash, and plausibly a sales agent. It also means
       revisiting the "cash only goes out" rule, which is currently load-bearing in every
@@ -819,17 +841,19 @@
       notice it fall due. The 2026-09-05 arrival date quoted to Tauhid can never arrive. Every
       overdue test in the shop is measured against a clock frozen at 2026-08-31.
       <br><strong>Needs:</strong> a tool to advance the shop date, and a scheduling agent that
-      wakes on dates rather than on tickets — the current team is entirely reactive and only
-      ever acts when a human presses a button.</div></li>
+      wakes on dates rather than on tickets &mdash; the current team is entirely reactive and
+      only ever acts when a human presses a button.</div></li>
   </ol>
 
   <h3>The short version</h3>
-  <p>Ticket 102 is the model of right-sized work. Ticket 101's silence toward a waiting
-  customer is the run's real failure, and it is invisible from the board because the ticket
-  still shows <strong>resolved</strong>. And approval #4 is the most useful thing that
-  happened all run: evidence that splitting the work across five agents introduced a bug a
-  single agent would not have had, and that the guardrails — not the prompts — are what caught
-  it.</p>
+  <p>Ticket 102 is the model of right-sized work and has been on every run. Ticket 101 is the
+  one that changed: the silence toward a waiting customer was the previous run's real failure,
+  invisible from the board because the ticket still showed <strong>resolved</strong>, and it
+  took a prompt that makes the draft a condition of closing rather than a suggestion to fix it.
+  And approval #4 is still the most useful thing that happens on this board: evidence,
+  reproduced across two runs, that splitting the work across five agents introduces a bug a
+  single agent would not have had, and that the guardrails &mdash; not the prompts &mdash; are
+  what catch it.</p>
 </section>
 
 <footer>

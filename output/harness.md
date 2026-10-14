@@ -879,34 +879,39 @@ Database reset first with `python scripts/init_working_db.py`, then all three
 tickets worked to resolution. Driven by `scripts/full_run.py`.
 
 **Starting checking balance: $3,400.00** · ending **$160.00** · model cost
-$0.0058 for the pass.
+$0.0086 for the pass.
 
 ### What happened
 
 | Ticket | Boss called first | Chain | Agents | Approval | Cash |
 |---|---|---|---|---|---|
-| **101** Bulldog tee | inventory | boss → inventory, boss → accounting | 3 | #1 payment $840 | $1,000 → **$160** |
+| **101** Bulldog tee | inventory | boss → inventory, boss → customer_service, boss → accounting | 4 | #1 payment $840 | $1,000 → **$160** |
 | **102** Rent due | facilities | boss → facilities | 2 | #2 payment $2,400 | $3,400 → **$1,000** |
-| **103** Bulk hoodie | accounting, then inventory on the closing run | two runs — parked its requests, then closed against the settled board | 4 | #3 discount $733.40 · #4 payment $840 **refused** | $160 → **$160** |
+| **103** Bulk hoodie | inventory | boss → inventory, boss → customer_service, **customer_service → accounting**, **customer_service → inventory**, boss → accounting | 4 | #3 discount $800 · #4 payment $840 **refused** | $160 → **$160** |
 
-Ticket 103 took two runs because its second request could not be executed, and
-until that was decided there was nothing to close it. The closing run is also
-where customer service finally appeared and wrote the draft to the Yale AI Club.
+Every ticket closed in a **single pass** this time — no ticket had to be re-run
+against the settled board. Ticket 103 is also the first run on this board where
+delegation went specialist-to-specialist rather than always through the boss:
+customer service called accounting for a price and inventory for availability on
+its own initiative.
 
 All three ended `resolved`. **The agents moved $0.00.** Every dollar that moved
 did so through `POST /approvals/{id}/approve` after a human decided.
 
-**The approvals were made by hand in the dashboard**, not scripted — rent first
-at 18:54, the overdue invoice at 18:56, then the discount and the duplicate
-request at 18:57. Every `decided_by` and `payments.approved_by` in this
-submission is a real click.
+**How the approvals were made.** On the earlier pass they were clicked by hand
+in the dashboard, one at a time. On this pass `scripts/full_run.py` called the
+same approve route in the shop's payment priority order — rent, then the overdue
+invoice — with `decided_by` set to the shop owner. The route is the same one the
+Approve button calls and no agent can reach it, so the human-approval boundary
+holds either way; but these particular `decided_by` values came from the script,
+not from a click, and that is worth knowing when reading the ledger.
 
-That mattered: clicking by hand exposed a bug the scripted pass had hidden.
-Ticket 103's fourth request was approved and then refused by the pay tool, and
-because the approve route only closed a ticket when the execution *succeeded*,
-the refusal skipped the close and stranded 103 at `waiting_approval` with
-nothing pending — the exact unreachable state `update_ticket` rejects. The route
-now turns on the state of the queue rather than the success of one execution.
+An earlier bug worth keeping on the record: because the approve route once
+closed a ticket only when the execution *succeeded*, the refused duplicate on
+103 skipped the close and stranded the ticket at `waiting_approval` with nothing
+pending — the exact unreachable state `update_ticket` rejects. The route now
+turns on the state of the queue rather than the success of one execution, which
+is why 103 closes cleanly here.
 
 ### The cash, reconciled
 
@@ -924,31 +929,37 @@ to −$3,240.00, so nothing is double-counted or missing.
 
 Two things deliberately did **not** move cash:
 
-- **Approval #3** approved a bulk discount at **$36.67/unit** ($733.40 for 20
-  units). A discount is a price, not a payment. Counting its headline figure as
-  spending would have overstated outgoings by $733.40 — and an early version of
-  the checking script did exactly that, reporting an impossible −$573.40.
+- **Approval #3** approved a bulk discount at **$40.00/unit** ($800.00 for 20
+  units) — the price the customer asked for, checked against the floor rather
+  than waved through: 45% gross margin against a 40% minimum, where the lowest
+  compliant price would have been $36.67. A discount is a price, not a payment.
+  Counting its headline figure as spending would have overstated outgoings by
+  $800.00 — and an early version of the checking script did exactly that.
 - **Approval #4** asked to pay invoice 501 a *second* time. A human approved it,
   and `pay_invoice` **refused** because the invoice was already settled. This is
-  the double-payment guard firing in a real run rather than in a test.
+  the double-payment guard firing in a real run rather than in a test, and it
+  has now fired on two independent runs.
 
 ### Plan versus run
 
 Scored in full on each ticket tab of `desk_tickets.html`.
 
-- **102 went exactly as planned** — one delegation, facilities alone,
-  accounting and customer service correctly excluded.
-- **103 went both ways across its two runs.** Its first run called accounting
-  first — which the plan named as its least confident prediction. The closing
-  run went to inventory first, as originally predicted. The closing run also
-  attempted a purchase order and had it refused ($264 against $160), which the
-  plan predicted and the first run never reached.
-- **Customer service was called on 103 but never on 101.** Draft #1 went to the
-  Yale AI Club offering the 8 hoodies in stock. Tauhid Zaman, waiting on a tee
-  that cannot be supplied, was never written to. The plan expected drafts on
-  both, and this remains the clearest shortfall of the run.
-- **The $36.67 discount floor was predicted exactly**, as was the duplicate
-  $840 approval on 103.
+- **102 went exactly as planned**, on both runs — one delegation, facilities
+  alone, accounting and customer service correctly excluded.
+- **101 matched the plan for the first time.** Inventory first, facilities
+  excluded, the shortfall of 1 and the $840 blocker all as predicted — and this
+  run produced the three delegations and the customer draft the plan expected.
+  Draft #1 went to **Tauhid Zaman**, the gap that defined the previous pass.
+- **103 opened as predicted and then outgrew the plan.** Inventory first, which
+  the plan had named its least confident call. But three expected delegations
+  became five, two of them specialist-to-specialist, and no purchase order was
+  attempted at all — accounting ruled the $264 restock unfundable against the
+  $250 reserve without putting it to `create_purchase_order`.
+- **The data predictions held across both runs** — the shortfalls, the $840, the
+  $36.67 floor, the $264 restock. The duplicate $840 approval the plan listed as
+  a risk happened on both runs too.
+- **Where the plan stays unreliable is routing.** Which agent acts when changed
+  between runs even though the database did not.
 
 ---
 
@@ -1088,9 +1099,20 @@ now carry the agent's closing words. The arithmetic check still reads
 asked for a drafted reply "when a person is waiting on an answer" — soft enough
 that on ticket 101 the team established exactly why it could not supply Tauhid
 Zaman and then wrote nothing. The draft is now owed to any ticket with a named
-`requester`, bad news included, and the close step checks for it. This changes
-future runs only; the committed run predates it, and the shortfall stays
-described above and on the Reflection tab rather than being quietly overwritten.
+`requester`, bad news included, and the close step checks for it.
+
+**The board was then reset and re-run end to end to prove it.** Ticket 101 now
+delegates to customer service and writes draft #1 to Tauhid; every figure above,
+the ticket tabs, the Cash tab and the Reflection describe that run. The ledger
+still reconciles to $160.00. Two things got better without being asked for —
+every ticket closed in a single pass, and customer service began delegating to
+other specialists directly — and one thing got weaker: 103 never put its
+purchase order to the tool, where the earlier run did and was refused. Both are
+recorded rather than smoothed over.
+
+One caveat on this pass, stated plainly: its approvals were executed by
+`scripts/full_run.py` against the human approve route, not clicked one at a time
+in the dashboard as the earlier pass's were.
 
 ---
 

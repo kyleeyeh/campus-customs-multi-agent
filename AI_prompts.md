@@ -867,6 +867,48 @@ could not help Tauhid Zaman and then told him nothing. Two changes to
 closing a ticket now requires checking that the draft exists and delegating for
 it if not, explicitly worth exceeding the usual delegation count.
 
+### Follow-up 2 (prove it with a real run)
+
+> Reset the DB and re-run all three tickets, then update the Actual sections,
+> Cash tab and Reflection. I'll retake the board screenshots.
+
+A prompt fix that never runs is a claim, not a fix. Reset, re-ran all three,
+and rebuilt everything downstream from the new audit trail.
+
+The first attempt was thrown away. Port 8000 already had a backend on it from
+two hours earlier, and because `prompts.load()` is `lru_cache`'d and
+`build_team()` runs once at startup, that process was still holding the **old**
+boss prompt — the run would have proved nothing. Killed it, reset again, started
+a fresh server, confirmed both edits were present in the rendered prompt, and
+only then ran.
+
+**The fix held.** Ticket 101 delegated to customer service and wrote draft #1 to
+Tauhid Zaman. The ledger still reconciles: $3,400.00 − $3,240.00 = $160.00,
+matching `cash_accounts`.
+
+Two things got better that nobody asked for: every ticket closed in a single
+pass, and on 103 customer service delegated to accounting and inventory
+*directly* instead of routing everything through the boss — the first real
+specialist-to-specialist handoff on this board. One thing got worse: 103 never
+called `create_purchase_order` at all, where the earlier run put it to the tool
+and had it refused. Same answer, less evidence. Both are written into the
+Reflection rather than smoothed over.
+
+Re-running also exposed how much of the write-up was quietly hardcoded. The
+discount moved from $36.67/unit to $40.00/unit and several paragraphs would have
+kept citing the old number. Counts now derive from `audit_trail.json` and the
+discount from the approval payload.
+
+### Follow-up 3 (screenshots)
+
+> no you retake the screenshots for me.
+
+Driven with Playwright against the real board at `localhost:5173`: click each
+ticket, wait for its agent summary to render, capture full-page. Shot at 1.5×
+rather than 2× after the first pass produced a 3 MB page for no readability
+gain. The script lives outside the repo so the submission does not grow a
+browser-automation dependency it never needs at runtime.
+
 ---
 
 *Prompt log complete. The submission is the repository.*

@@ -67,13 +67,19 @@ SCORECARD: dict[int, list[tuple[str, bool | None, str]]] = {
     101: [
         ("Boss calls inventory first", True, "It did — stock was the branch-decider, as argued."),
         ("Facilities not involved", True, "Never called. Rent appeared only inside get_cash_position."),
-        ("Three delegations", False, "Two. The boss ran both hops itself."),
+        ("Three delegations", True, "Three: inventory, customer_service, accounting — all fanned out from the boss."),
         (
             "Inventory delegates straight to accounting",
             False,
-            "Flagged as the least certain call, and it was wrong: inventory reported back and the boss routed to accounting.",
+            "Flagged as the least certain call, and it was wrong again: inventory reported back "
+            "and the boss routed to accounting itself.",
         ),
-        ("Customer service drafts a reply", False, "Never called. No draft was written for Tauhid — the real gap in this run."),
+        (
+            "Customer service drafts a reply",
+            True,
+            "Draft #1 to Tauhid Zaman — says size S is unavailable, promises no shipment, and "
+            "commits only to following up.",
+        ),
         ("Shortfall of 1, blocked by invoice 501 ($840)", True, "Exactly that."),
         ("No purchase order raised", True, "None attempted, as expected while the vendor was blocked."),
         ("Agents move $0.00", True, "Approval parked; nothing paid until a human decided."),
@@ -83,40 +89,50 @@ SCORECARD: dict[int, list[tuple[str, bool | None, str]]] = {
         ("Exactly one delegation", True, "One. boss → facilities and back."),
         ("Accounting deliberately excluded", True, "Not called. Facilities read the balance itself."),
         ("Customer service not involved", True, "Not called; the answer to a rent notice is a payment."),
-        ("Tools: get_lease, get_cash_position, request_approval", True, "All three, plus get_ticket."),
+        ("Tools: get_lease, get_cash_position, request_approval", True, "All three, plus list_approvals."),
         ("Rent $2,400 due 2026-09-02, no invoice row", True, "Confirmed from the lease."),
-        ("Cheapest ticket on the board", True, "Fewest hops of the three."),
+        ("Cheapest ticket on the board", True, "Two agents, six tool calls — fewest of the three."),
         ("Agents move $0.00", True, "Approval #2 parked and nothing else."),
     ],
     103: [
         (
             "Boss calls inventory first",
-            None,
-            "Both, across two runs. The first run went to ACCOUNTING first — which the plan "
-            "named as its least confident call. The closing run went to inventory first, as "
-            "predicted.",
+            True,
+            "Right this time. The plan named this its least confident call; the run opened "
+            "boss → inventory exactly as predicted.",
         ),
-        ("Three delegations", None, "Three on the first run, four on the closing run."),
-        ("Facilities not involved", True, "Correctly left out of both runs."),
-        ("Discount floor of $36.67/unit", True, "evaluate_discount returned exactly $36.67."),
-        ("Shortfall of 12, restock $264", True, "8 of 20 on hand; $264 to close the gap."),
+        (
+            "Three delegations",
+            False,
+            "Five — and two of them were specialist-to-specialist: customer_service → "
+            "accounting and customer_service → inventory, without passing back through the boss.",
+        ),
+        ("Facilities not involved", True, "Correctly left out."),
+        (
+            "Discount floor of $36.67/unit",
+            None,
+            "The floor was computed exactly — evaluate_discount returned $36.67 as the lowest "
+            "price meeting the 40% margin. But the shop approved the customer's own $40.00 "
+            "offer (45% margin, $800 for 20) rather than countering down to the floor.",
+        ),
+        ("Shortfall of 12, restock $264", True, "8 of 20 on hand; find_restock_vendor priced the 12-unit gap at $264."),
         (
             "A purchase order is attempted and refused",
-            True,
-            "The closing run called create_purchase_order and it was refused — $264 against "
-            "$160. purchase_orders is empty, so nothing was committed.",
+            False,
+            "No purchase order was attempted at all this time. Accounting reasoned ahead of the "
+            "tool — it ruled the $264 restock unfundable against the $250 reserve and never "
+            "called create_purchase_order. purchase_orders is empty either way.",
         ),
         (
             "Customer service drafts a reply",
             True,
-            "Draft #1 to the Yale AI Club, offering the 8 in stock. Written on the closing "
-            "run, not the first.",
+            "Draft #2 to the Yale AI Club: 8 of 20 available, the rest not fillable now.",
         ),
         (
             "A duplicate $840 approval may be raised",
             True,
-            "It was — approval #4. A human approved it and pay_invoice still refused, because "
-            "invoice 501 had already been settled by approval #1.",
+            "It was — approval #4, again. A human approved it and pay_invoice still refused, "
+            "because invoice 501 had already been settled by approval #1.",
         ),
         ("Agents move $0.00", True, "Nothing moved on this ticket at all."),
     ],
@@ -204,6 +220,15 @@ def cash_tab(doc: dict) -> str:
         )
 
     chk = doc["arithmetic_check"]
+    # The approved discount, read off the approval itself. The agents choose the
+    # price inside the margin floor, so it can differ run to run — quoting the
+    # payload keeps this paragraph honest without a hand-edit each time.
+    disc = next(
+        a for t in doc["tickets"] for a in t["human_approvals"] if a["kind"] == "discount"
+    )
+    disc_qty = (disc.get("payload") or {}).get("qty")
+    disc_unit = (disc.get("payload") or {}).get("unit_price")
+
     # A payment approval that a human approved but which produced no payment
     # row was refused by the pay tool. That is the most interesting line in the
     # whole ledger, so it is called out rather than silently omitted.
@@ -267,10 +292,10 @@ def cash_tab(doc: dict) -> str:
 
   <h3>Two things that did not move cash, and why</h3>
   <ul class="tight">
-    <li>Approval <strong>#3</strong> on ticket 103 approved a bulk discount at
-      <strong>$36.67</strong>/unit ({money(733.40)} for 20 units). A discount is a price, not a
-      payment — nothing is debited, and counting its headline figure as spending would overstate
-      outgoings by {money(733.40)}.</li>
+    <li>Approval <strong>#{disc['approval_id']}</strong> on ticket 103 approved a bulk discount
+      at <strong>{money(disc_unit)}</strong>/unit ({money(disc['amount'])} for {disc_qty} units).
+      A discount is a price, not a payment — nothing is debited, and counting its headline figure
+      as spending would overstate outgoings by {money(disc['amount'])}.</li>
     {refused_note}
     <li>No purchase order was ever placed, so no restock was committed. The 12-unit hoodie
       restock at {money(264.0)} could not be funded from the {money(160.0)} remaining, and the

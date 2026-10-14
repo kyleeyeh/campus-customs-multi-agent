@@ -1,7 +1,7 @@
 STARTING CHECKING BALANCE: $3,400.00
 
 --- running ticket 101 ---
-    waiting_approval | assignee accounting | delegated ['inventory', 'accounting'] | approvals [1] | drafts []
+    waiting_approval | assignee accounting | delegated ['inventory', 'customer_service', 'accounting'] | approvals [1] | drafts [1]
     cash after run: $3,400.00  (agents move no money)
 
 --- running ticket 102 ---
@@ -9,14 +9,14 @@ STARTING CHECKING BALANCE: $3,400.00
     cash after run: $3,400.00  (agents move no money)
 
 --- running ticket 103 ---
-    waiting_approval | assignee accounting | delegated ['accounting', 'inventory', 'accounting'] | approvals [3, 4] | drafts []
+    None | assignee None | delegated None | approvals None | drafts None
     cash after run: $3,400.00  (agents move no money)
 
 --- 4 approval(s) awaiting a human ---
     #2 t102 payment $2,400.00 -> executed=True closed=True $3,400.00 -> $1,000.00
     #1 t101 payment $840.00 -> executed=True closed=True $1,000.00 -> $160.00
     #4 t103 payment $840.00 -> executed=False closed=False $160.00 -> $160.00
-    #3 t103 discount $733.40 -> executed=True closed=True $160.00 -> $160.00
+    #3 t103 discount $800.00 -> executed=True closed=True $160.00 -> $160.00
 
 ==================================================================
 BOARD: open=0  resolved=3
