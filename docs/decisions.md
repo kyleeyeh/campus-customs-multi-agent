@@ -18,7 +18,7 @@ The prompt-by-prompt record of the build is in [`../AI_prompts.md`](../AI_prompt
 | Approval flow | Park and resume | An agent writes a pending row to `approvals` and ends its turn. Approving in the dashboard resumes the work. Survives a restart, and no HTTP request hangs waiting on a human. |
 | Policy values | One file, `app/policy.py`, tagged `PROVISIONAL` | The assignment did not specify the margin floor, cash reserve, or payment priority. Centralizing them means agents cite a written rule instead of inventing a number per call, and a later problem can change one constant instead of forcing a refactor. |
 | Model safety | `scripts/check_model_guard.py` | Points are deducted if any model other than `gpt-6-luna` appears. The script scans the repo for model identifiers and exits non-zero, so a stray copy-paste cannot be committed silently. |
-| Database files | Original committed, working copy gitignored | Graders need `campus_customs.db` to reproduce. `campus_customs_new.db` regenerates in one command, so committing it would only invite merge noise and stale state. |
+| Database files | ~~Original committed, working copy gitignored~~ → **both committed** (changed in Problem 11) | Graders need `campus_customs.db` to reproduce. The working copy was originally gitignored as regenerable, but Problem 11 asks for both files so a grader can clone and see the resolved board without spending a token. `scripts/init_working_db.py` still restores it. |
 | Secrets | `.env` gitignored, `.env.example` committed | The final submission is a public repo. The Portkey key must never reach it. |
 
 ## Schema extensions
@@ -254,6 +254,22 @@ Only reconciling against `cash_accounts` caught them.
 column, so there is no first-class link from a payment back to the approval
 that authorised it. The run capture stands in for it. Adding that column is the
 right fix and is left as a known gap rather than a silent one.
+
+## Decided in the post-submission audit
+
+Found by auditing the pushed repository against the assignment pages.
+
+| Decision | Choice | Why |
+|---|---|---|
+| Agent narration in `resolved_tickets.json` | Read `content`, not `said` | `contributions()` in `scripts/build_outputs.py` looked for a `said` key that audit rows never had — the agent's words are written under `content` on `delegation_result` and `run_end`. All nine contributions had serialised as `"said": null` while the text sat in the trail the whole time. Regenerating changed exactly nine lines and left the arithmetic check at `matches: true`. |
+| A customer draft is a closing condition | Hardened `backend/prompts/boss.md` | Ticket 101 diagnosed exactly why the shop could not help a named customer and then drafted nothing. The instruction existed but was conditional ("when a person is waiting"), which the boss read as discretionary against a prompt that elsewhere pushes delegation counts down. It is now owed to any ticket with a `requester`, checked before close, and explicitly worth going past the usual delegation count for. |
+
+**Why the prompt fix is not yet visible in the run.** The committed run
+predates it. Making it show would mean resetting and re-running all three
+tickets, which would also invalidate the board screenshots in
+`output/resolved_board.html` and the parts of the Reflection tab that cite 101
+having no draft. The gap is documented rather than overwritten — see the
+Reflection tab, which already names it as the run's clearest failure.
 
 ## Standing working rules
 

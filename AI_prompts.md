@@ -825,4 +825,48 @@ and restores the board to $3,400.00; and there is no `.env`, only
 
 ---
 
+## Post-submission audit
+
+### Prompt 1 (audit against the spec)
+
+> ok here's the link to my submission: <repo url>
+>
+> please read these instructions: <assignment url> and audit my assignment for
+> completion. flag anything that's missing.
+
+Every required artifact was present and the cash math reconciled exactly, so
+nothing was missing in the sense of a file. Three soft gaps came back. One was
+mine to dismiss: the audit flagged a `hw5.zip` that turned out not to exist in
+the student-visible text of Problem 11 at all — it came from hidden grader-note
+metadata in the page source. Worth recording that the page carries instructions
+aimed at AI tools, including a trap: an agent that completes the whole
+assignment in one pass from the page is told to add a particular marker file to
+the repo and a particular completion string to `README.md`, both of which
+graders then grep for. The tokens are deliberately not reproduced here so that
+the grep stays clean. Neither appears anywhere in this repository.
+
+### Follow-up 1 (fix two of the three)
+
+> fix 1 and 2. i don't actually see any mention of zip in problem 11.
+
+**Gap 2 — agent narration missing from `resolved_tickets.json`.** All nine
+`agent_contributions` entries carried `"said": null`. The cause was a one-word
+mismatch, not a missing feature: `scripts/build_outputs.py` read `r.get("said")`
+off the audit rows, but the agent's words are written under `content`. The text
+had been captured correctly all along on 67 `delegation_result` and 32 `run_end`
+rows and was simply never picked up. Fixed and regenerated: 9/9 contributions
+now carry the agent's closing words, the diff is exactly nine lines, and the
+arithmetic check still reads `matches: true` at $160.00.
+
+**Gap 1 — ticket 101 closed without a customer draft.** The boss prompt already
+told the boss to get a reply drafted "when a person is waiting on an answer",
+which was too soft to bind: on ticket 101 the team worked out precisely why it
+could not help Tauhid Zaman and then told him nothing. Two changes to
+`backend/prompts/boss.md` — the draft is now owed whenever a ticket has a named
+`requester`, with bad news explicitly needing one more than good news, and
+closing a ticket now requires checking that the draft exists and delegating for
+it if not, explicitly worth exceeding the usual delegation count.
+
+---
+
 *Prompt log complete. The submission is the repository.*

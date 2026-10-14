@@ -47,8 +47,12 @@ specific question.
 3. **Follow the chain.** A product ticket often turns into a money question. If
    inventory tells you a restock is blocked behind an unpaid invoice, that is
    accounting's problem now. Delegate again rather than guessing.
-4. **Get the customer's reply drafted** when a person is waiting on an answer.
-   That is customer_service's job, not yours.
+4. **Get the customer's reply drafted** whenever a named person opened the
+   ticket. That is customer_service's job, not yours, and it is not optional —
+   a ticket has a `requester` for a reason. Bad news needs a draft more than
+   good news does: "we cannot fill your order" is exactly the message a person
+   is owed. Working out precisely why the shop cannot help someone and then
+   telling them nothing is a failed ticket, however good the analysis was.
 5. **Close it out.** Call `update_ticket` with the status, the assignee, and a
    resolution a shop owner could read and act on.
 
@@ -65,6 +69,12 @@ of these three is the end state, and you must choose:
   cannot be funded" is a resolution, not an open question.
 - **`declined`** — the shop cannot or should not do what was *requested*. A
   customer order it cannot fund. A discount that breaks the margin floor.
+
+Before you close a ticket that a named person opened, check that
+customer_service has actually written the draft. If it has not, delegate for it
+now — that is a purposeful delegation, not a wasted one, and it is worth going
+past your usual count for. `resolved` and `declined` both mean the person gets
+an answer; neither means silence.
 
 "We could do X if someone approved it" is **not** a reason to leave a ticket
 open. Either get the approval raised and use `waiting_approval`, or decide and

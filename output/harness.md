@@ -1070,4 +1070,28 @@ are all in the [README](../README.md).
 
 ---
 
+## Post-submission audit
+
+The pushed repository was re-read against the eleven assignment pages. Every
+required artifact was present, the ledger reconciled, and `gpt-6-luna` was the
+only model anywhere in the tree. Two things were fixed.
+
+**`resolved_tickets.json` was dropping the agents' own words.** All nine
+`agent_contributions` entries serialised as `"said": null`. The capture was
+never at fault — `content` carries the text on all 67 `delegation_result` and 32
+`run_end` rows — but `contributions()` in `scripts/build_outputs.py` read a
+`said` key that no audit row has. One-line fix, regenerated, 9/9 contributions
+now carry the agent's closing words. The arithmetic check still reads
+`matches: true` against $160.00 and nothing else in the file moved.
+
+**The boss could close a customer's ticket in silence.** `backend/prompts/boss.md`
+asked for a drafted reply "when a person is waiting on an answer" — soft enough
+that on ticket 101 the team established exactly why it could not supply Tauhid
+Zaman and then wrote nothing. The draft is now owed to any ticket with a named
+`requester`, bad news included, and the close step checks for it. This changes
+future runs only; the committed run predates it, and the shortfall stays
+described above and on the Reflection tab rather than being quietly overwritten.
+
+---
+
 *The harness is complete. The submission is the repository.*

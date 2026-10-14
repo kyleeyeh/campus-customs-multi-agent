@@ -108,8 +108,12 @@ def contributions(trail: list[dict], run_ids: list[str]) -> list[dict]:
         if r.get("event") == "delegation" and r.get("to_agent"):
             if r["to_agent"] not in entry["delegated_to"]:
                 entry["delegated_to"].append(r["to_agent"])
-        if r.get("event") in {"delegation_result", "run_end"} and r.get("said"):
-            entry["said"] = r["said"]
+        # The agent's own words live under `content` on the row that closes its
+        # turn: `delegation_result` when a specialist reports back to whoever
+        # called it, `run_end` for the boss closing the whole ticket. Taking the
+        # last one keeps the agent's final word rather than an interim note.
+        if r.get("event") in {"delegation_result", "run_end"} and r.get("content"):
+            entry["said"] = r["content"]
 
     return [acc[a] for a in order]
 

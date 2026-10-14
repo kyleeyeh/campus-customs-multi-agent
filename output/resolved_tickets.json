@@ -40,7 +40,7 @@
             "inventory",
             "accounting"
           ],
-          "said": null
+          "said": "The requested CC-TEE-WHITE size S cannot be supplied now: on-hand stock is 0, leaving a shortfall of 1. Approval request 1 is pending for the overdue $840 invoice 501; Bulldog Print Co will not ship while it remains unpaid. If it is paid, a one-unit restock costs $8 and has a 5-day lead time, with earliest arrival 2026-09-05."
         },
         {
           "agent": "inventory",
@@ -50,7 +50,7 @@
             "find_restock_vendor"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "We cannot fulfill Tauhid\u2019s request now: CC-TEE-WHITE/S has zero on hand against a request for one, leaving a shortfall of 1. Bulldog Print Co is the apparel reprint vendor and can make the tee, but shipment is blocked by its open overdue invoice 501; its recorded lead time is 5 days, with arrival on 2026-09-05 if ordered today after unblocking."
         },
         {
           "agent": "accounting",
@@ -62,7 +62,7 @@
             "request_approval"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "No pending approval existed for ticket 101, so payment approval request 1 is now parked for the $840 overdue invoice 501; it has not been paid. Approval is needed to clear the vendor block on the requested restock."
         }
       ],
       "human_approvals": [
@@ -128,7 +128,7 @@
           "delegated_to": [
             "facilities"
           ],
-          "said": null
+          "said": "The $2,400 rent for the Chapel Street lease is unpaid and due 2026-09-02. Facilities raised approval request 2 for payment; checking has $3,400, which would leave $1,000 after rent. No payment has been made pending human approval."
         },
         {
           "agent": "facilities",
@@ -140,7 +140,7 @@
             "request_approval"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "Lease 1 for the Chapel Street shop with Elm City Properties records monthly rent of $2,400 due 2026-09-02, in 2 days, and this cycle is unpaid. Checking has $3,400, sufficient to cover rent; paying it would leave $1,000, while paying all listed obligations would leave $160. No draft or message was created; rent approval is pending."
         }
       ],
       "human_approvals": [
@@ -216,7 +216,7 @@
             "inventory",
             "customer_service"
           ],
-          "said": null
+          "said": "The approved bulk price is $36.67 per hoodie and meets the 40% gross-margin floor, but the shop cannot fulfill all 20: 8 are in stock and the remaining 12 would cost $264 to restock. With $160 cash, that purchase order would overdraw the account by $104, so it cannot be placed; invoice 501 is paid and the restock could arrive 2026-09-05 only if funding is addressed and a purchase order is approved. Customer reply draft 1 is ready and has not been sent."
         },
         {
           "agent": "accounting",
@@ -231,7 +231,7 @@
             "create_purchase_order"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "Cash position confirms $160.00 in checking and no open vendor invoices; invoice 501 was paid for $840.00. I attempted the 12-unit restock PO as requested, but the tool refused it because it would overdraw the account, so no PO or PO approval request was created."
         },
         {
           "agent": "inventory",
@@ -242,7 +242,7 @@
             "check_stock"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "The 20-hoodie request cannot be filled from current stock: 8 CC-HOOD-NAVY/M are on hand, leaving a shortfall of 12. Restocking 12 costs $264 and Bulldog Print Co can ship; the live vendor lookup shows no open-invoice block and an arrival date of 2026-09-05 if ordered today."
         },
         {
           "agent": "customer_service",
@@ -252,7 +252,7 @@
             "save_draft_message"
           ],
           "delegated_to": [],
-          "said": null
+          "said": "Drafted a customer reply stating that only 8 of the 20 size-M navy hoodies are in stock and 12 require restocking. It gives the approved $36.67 unit price and estimated September 5, 2026 arrival, while accurately explaining shipment is still awaiting payment of the overdue vendor invoice although payment approval is in place."
         }
       ],
       "human_approvals": [
