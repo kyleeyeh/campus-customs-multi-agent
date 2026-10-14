@@ -1053,4 +1053,21 @@ the call stack · 4–8 tool schemas per agent instead of all 17.
 
 ---
 
+## The repository
+
+<https://github.com/kyleeyeh/campus-customs-multi-agent> — public, also recorded
+in [`github_url.txt`](github_url.txt).
+
+Both database files ship. `data/campus_customs.db` is the pristine original;
+`data/campus_customs_new.db` is the working copy **as the agents left it**, so a
+clone shows three resolved tickets and a $160.00 balance without running
+anything. `python scripts/init_working_db.py` restores the board to $3,400.00
+and three open tickets.
+
+`.env` is not in the repository and never was — it lives outside the project
+folder. Setup, the four things to start, and the reset-before-a-full-run rule
+are all in the [README](../README.md).
+
+---
+
 *The harness is complete. The submission is the repository.*

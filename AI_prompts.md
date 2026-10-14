@@ -774,6 +774,55 @@ real failure (invisible from the board, because the ticket still reads
 agents introduced a duplicate request a single agent would not have made — with
 the guardrails, not the prompts, being what caught it.
 
+## Problem 11 — Submit to GitHub
+
+### Prompt 1
+
+> problem 11: submit to github
+>
+> push your code to a public github repository so graders can clone it. i will submit the repo URL, but also put it in output/github_url.txt.
+>
+> do not push my real .env to the github repo. do include both database files under data/ (the original as well as the working copy) so graders can run the app easily.
+>
+> attached is the expected file layout.
+>
+> README should explain: copy original DB to the working copy when you need a clean run, start MCP server, start FastAPI backend, start the React board, reset the DB before a full three-ticket run.
+
+**No follow-up was needed.** Published to
+<https://github.com/kyleeyeh/campus-customs-multi-agent>, recorded in
+`output/github_url.txt`.
+
+**The `.gitignore` had to be changed in the one place it mattered.** The working
+copy `data/campus_customs_new.db` had been deliberately ignored since Problem 1,
+on the reasoning that it regenerates in one command and committing it would only
+invite stale state. This prompt reverses that, and the new reasoning is better:
+shipping the working copy as the agents left it means a grader can clone the
+repo and immediately see three resolved tickets and the $160.00 ending balance
+without running a single agent or spending a token. The rationale is written at
+the rule rather than left implicit.
+
+**Secrets were checked three ways before anything was pushed**, since a
+published key cannot be unpublished. The real `.env` turned out to live in the
+*parent* folder — `app/config.py` loads from the project root and then falls
+back one level up — so it was never inside the repository to begin with. On top
+of that: the live key was read at runtime and grepped for across every file that
+would be committed (absent), the staged file list was checked for any `.env`
+(none), and the remote tree was re-read from the GitHub API after the push to
+confirm what actually landed rather than what was intended to land.
+
+**`.claude/` was excluded.** It held a dev-server launch config and the local
+MCP approval record — both specific to one machine, neither useful to a grader.
+`.mcp.json` at the root is committed, because that one *is* the project's MCP
+configuration.
+
+**Verified by cloning it.** The repository was cloned fresh into a scratch
+directory and checked as a grader would see it: the shipped working database
+reads $160.00 with all three tickets resolved and both payments recorded against
+Kyle Yeh; the pristine original still reads $3,400.00 with three open tickets
+and no payments; `python scripts/init_working_db.py` runs from the clean clone
+and restores the board to $3,400.00; and there is no `.env`, only
+`.env.example`. Every path in the attached layout is present on the remote.
+
 ---
 
 *Prompt log complete. The submission is the repository.*
